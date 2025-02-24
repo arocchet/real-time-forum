@@ -3,8 +3,10 @@ package main
 import (
 	"log"
 	db "main/server/DB"
+	"main/server/api/categories"
 	comment "main/server/api/comment"
 	post "main/server/api/post"
+	privatemsg "main/server/api/private_msg"
 	user "main/server/api/user"
 	"main/server/handlers"
 	"net/http"
@@ -13,7 +15,11 @@ import (
 )
 
 func main() {
-	db.Init()
+	db,err := db.Init()
+	if err != nil {
+    log.Fatal(err)
+  }
+	defer db.Close()
 
 	port := "8088" // port par défaut
 
@@ -45,12 +51,42 @@ func main() {
 		}
 	})
 
+	mux.HandleFunc("/api/private_msg", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			privatemsg.Get(w, r,db)
+		case "POST":
+			privatemsg.Post(w, r,db)
+		case "PUT":
+			privatemsg.Put(w, r)
+		case "DELETE":
+			privatemsg.Delete(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
+	mux.HandleFunc("/api/categories", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			categories.Get(w, r, db)
+		case "POST":
+			categories.Post(w, r, db)
+		case "PUT":
+			categories.Put(w, r)
+		case "DELETE":
+			categories.Delete(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
 	mux.HandleFunc("/api/post", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			post.Get(w, r)
+			post.Get(w, r, db)
 		case "POST":
-			post.Post(w, r)
+			post.Post(w, r, db)
 		case "PUT":
 			post.Put(w, r)
 		case "DELETE":
@@ -63,9 +99,9 @@ func main() {
 	mux.HandleFunc("/api/comment", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			comment.Get(w, r)
+			comment.Get(w, r, db)
 		case "POST":
-			comment.Post(w, r)
+			comment.Post(w, r, db)
 		case "PUT":
 			comment.Put(w, r)
 		case "DELETE":
@@ -88,7 +124,7 @@ func main() {
 
 	// Lancer le serveur
 	log.Println("Server started on http://localhost:" + port)
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	if err != nil {
 		log.Fatalf("failed to start server: %s", err)
 	}

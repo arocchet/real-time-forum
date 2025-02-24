@@ -7,25 +7,27 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func Init() {
+func Init() (*sql.DB,error) {
 
 	db, err := sql.Open("sqlite3","./database.db")
 	if err != nil {
     log.Fatal(err)
+		return nil,err
   }
-	defer db.Close()
 
 	CreateUser(db)
 	CreateCategories(db)
 	CreatePrivateMsg(db)
 	CreateComments(db)
 	CreatePosts(db)
+
+	return db,nil
 }
 
 func CreateUser(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS users(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		id VARCHAR(55) PRIMARY KEY,
 		username TEXT NOT NULL UNIQUE,
 		first_name TEXT NOT NULL,
 		last_name TEXT NOT NULL,
@@ -104,7 +106,7 @@ func CreateCategories(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS categories(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT NOT NULL
+		name TEXT NOT NULL UNIQUE
 	);`
 
 	_, err := db.Exec(query)
