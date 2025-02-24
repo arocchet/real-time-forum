@@ -8,9 +8,24 @@
   </head>
   <body class="dark-theme">
     <div id="container" class="container">
+      <div id="modal" class="modal" style="display: none">
+        <div class="modal-content">
+          <span id="close-modal" class="close-btn">&times;</span>
+          <div id="modal-body">
+            
+          </div>
+          <div id="modal-footer">
+            
+          </div>
+        </div>
+      </div>
+
       <div id="banner" class="banner"></div>
 
-      <div id="sidebar" class="sidebar">Sidebar</div>
+      <div id="sidebar" class="sidebar">
+        <button id="login-btn" class="login-btn">L</button>
+        <button id="logout-btn" class="logout-btn">➔</button>
+      </div>
       <main id="main" class="main">Main</main>
 
       <div id="rightside" class="rightside">
@@ -38,7 +53,7 @@
             </g>
           </svg>
         </div>
-        <div class="new-post">+</div>
+        <div id="new-post" class="new-post">+</div>
       </div>
 
       <div id="low-content" class="low-content"></div>
