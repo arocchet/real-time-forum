@@ -9,32 +9,32 @@ import (
 )
 
 type Message struct {
-	ID int `json:"id"`
-	Sender_id  int `json:"sender_id"`
-	Receiver_id int `json:"receiver_id"`
-	Content string `json:"content"`
-	Date string `json:"date"`
+	ID          int    `json:"id"`
+	Sender_id   int    `json:"sender_id"`
+	Receiver_id int    `json:"receiver_id"`
+	Content     string `json:"content"`
+	Date        string `json:"date"`
 }
 
-func Post(w http.ResponseWriter, r *http.Request, db *sql.DB){
-	var msg Message	
+func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var msg Message
 
 	err := json.NewDecoder(r.Body).Decode(&msg)
 	if err != nil {
-    http.Error(w, err.Error(), http.StatusBadRequest)
-    return
-  }
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	if msg.Content == "" {
-        http.Error(w, "Missing fields in request", http.StatusBadRequest)
-        return
-  }
-	
+		http.Error(w, "Missing fields in request", http.StatusBadRequest)
+		return
+	}
+
 	_, err = db.Exec("INSERT INTO private_msg (sender_id,receiver_id,content) VALUES (?,?,?)", msg.Sender_id, msg.Receiver_id, msg.Content)
 	if err != nil {
-    http.Error(w, err.Error(), http.StatusInternalServerError)
-    return
-  }
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	fmt.Println("Message added successfuly !")
 }

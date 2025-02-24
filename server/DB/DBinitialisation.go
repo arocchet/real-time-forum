@@ -7,13 +7,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func Init() (*sql.DB,error) {
+func Init() (*sql.DB, error) {
 
-	db, err := sql.Open("sqlite3","./database.db")
+	db, err := sql.Open("sqlite3", "./database.db")
 	if err != nil {
-    log.Fatal(err)
-		return nil,err
-  }
+		log.Fatal(err)
+		return nil, err
+	}
 
 	CreateUser(db)
 	CreateCategories(db)
@@ -22,7 +22,7 @@ func Init() (*sql.DB,error) {
 	CreatePosts(db)
 	CreateSessions(db)
 
-	return db,nil
+	return db, nil
 }
 
 func CreateUser(db *sql.DB) {
@@ -40,8 +40,8 @@ func CreateUser(db *sql.DB) {
 
 	_, err := db.Exec(query)
 	if err != nil {
-    log.Fatal(err)
-  }
+		log.Fatal(err)
+	}
 	log.Println("Table 'users' created successfully")
 }
 
@@ -59,8 +59,8 @@ func CreatePrivateMsg(db *sql.DB) {
 
 	_, err := db.Exec(query)
 	if err != nil {
-    log.Fatal(err)
-  }
+		log.Fatal(err)
+	}
 	log.Println("Table 'private_msg' created successfully")
 }
 
@@ -78,8 +78,8 @@ func CreateComments(db *sql.DB) {
 
 	_, err := db.Exec(query)
 	if err != nil {
-    log.Fatal(err)
-  }
+		log.Fatal(err)
+	}
 	log.Println("Table 'comments' created successfully")
 }
 
@@ -98,8 +98,8 @@ func CreatePosts(db *sql.DB) {
 
 	_, err := db.Exec(query)
 	if err != nil {
-    log.Fatal(err)
-  }
+		log.Fatal(err)
+	}
 	log.Println("Table 'posts' created successfully")
 }
 
@@ -112,8 +112,8 @@ func CreateCategories(db *sql.DB) {
 
 	_, err := db.Exec(query)
 	if err != nil {
-    log.Fatal(err)
-  }
+		log.Fatal(err)
+	}
 	log.Println("Table 'categories' created successfully")
 }
 
@@ -126,7 +126,7 @@ func CreateSessions(db *sql.DB) {
 
 	_, err := db.Exec(query)
 	if err != nil {
-    log.Fatal(err)
-  }
+		log.Fatal(err)
+	}
 	log.Println("Table 'sessions' created successfully")
 }

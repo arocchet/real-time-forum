@@ -5,8 +5,10 @@ import (
 	db "main/server/DB"
 	"main/server/api/categories"
 	comment "main/server/api/comment"
+	"main/server/api/login"
 	post "main/server/api/post"
 	privatemsg "main/server/api/private_msg"
+	"main/server/api/register"
 	"main/server/api/sessions"
 	user "main/server/api/user"
 	"main/server/handlers"
@@ -16,13 +18,13 @@ import (
 )
 
 func main() {
-	db,err := db.Init()
+	db, err := db.Init()
 	if err != nil {
-    log.Fatal(err)
-  }
+		log.Fatal(err)
+	}
 	defer db.Close()
 
-	port := "8088" // port par défaut
+	port := "8080" // port par défaut
 
 	// Si un port est passé en argument, on l'utilise
 	if len(os.Args) > 1 {
@@ -52,6 +54,24 @@ func main() {
 		}
 	})
 
+	mux.HandleFunc("/api/register", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "POST":
+			register.Post(w, r, db, port)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
+	mux.HandleFunc("/api/login", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "POST":
+			login.Post(w, r, db, port)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
 	mux.HandleFunc("/api/sessions", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
@@ -61,7 +81,7 @@ func main() {
 		case "PUT":
 			sessions.Put(w, r)
 		case "DELETE":
-			sessions.Delete(w, r)
+			sessions.Delete(w, r, db)
 		default:
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		}
@@ -70,9 +90,9 @@ func main() {
 	mux.HandleFunc("/api/private_msg", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			privatemsg.Get(w, r,db)
+			privatemsg.Get(w, r, db)
 		case "POST":
-			privatemsg.Post(w, r,db)
+			privatemsg.Post(w, r, db)
 		case "PUT":
 			privatemsg.Put(w, r)
 		case "DELETE":

@@ -250,8 +250,8 @@ body {
   height: clamp(2rem, 3vmax, 4rem);
   width: clamp(2rem, 3vmax, 4rem);
 
-  background-color: var(--blueFill);
-  color: var(--bgLevel2);
+  background-color: var(--bgLevel2);
+  color: var(--textNeutral);
 
   font-size: 200%;
   font-weight: lighter;
@@ -273,7 +273,6 @@ body {
   width: clamp(2rem, 3vmax, 4rem);
 
   background-color: var(--redFill);
-  color: var(--bgLevel2);
 
   font-size: 200%;
   font-weight: lighter;
@@ -283,7 +282,7 @@ body {
 }
 
 .login-btn:hover {
-  background-color: var(--blue50);
+  background-color: var(--greyFill);
 }
 
 .logout-btn:hover {
@@ -298,7 +297,7 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7); /* Assombrir l'écran */
+  background-color: rgba(0, 0, 0, 0.7); /* Assombrir l'Ã©cran */
 }
 
 .modal-content {
@@ -339,6 +338,7 @@ body {
 .modal-input {
   border-radius: 10px;
   border: 1px solid var(--greyFill);
+  
 }
 
 .modal-area {
@@ -348,5 +348,5 @@ body {
 
 .modal-href {
   text-decoration: none;
-  color: var(--red);
+  color: var(--pinkFill);
 }

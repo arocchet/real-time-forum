@@ -9,29 +9,29 @@ import (
 )
 
 type Category struct {
-	ID int `json:"id"`
-	Name  string `json:"name"`
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
-func Post(w http.ResponseWriter, r *http.Request, db *sql.DB){
-	var cat Category	
+func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var cat Category
 
 	err := json.NewDecoder(r.Body).Decode(&cat)
 	if err != nil {
-    http.Error(w, err.Error(), http.StatusBadRequest)
-    return
-  }
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	if cat.Name == "" {
-        http.Error(w, "Missing fields in request", http.StatusBadRequest)
-        return
-  }
-	
+		http.Error(w, "Missing fields in request", http.StatusBadRequest)
+		return
+	}
+
 	_, err = db.Exec("INSERT INTO categories (name) VALUES (?)", cat.Name)
 	if err != nil {
-    http.Error(w, err.Error(), http.StatusInternalServerError)
-    return
-  }
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	fmt.Println("Category added successfuly !")
 }
