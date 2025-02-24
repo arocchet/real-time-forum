@@ -27,6 +27,10 @@ func CreateUser(db *sql.DB) {
 	CREATE TABLE IF NOT EXISTS users(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		username TEXT NOT NULL UNIQUE,
+		first_name TEXT NOT NULL,
+		last_name TEXT NOT NULL,
+    gender TEXT NOT NULL,
+    age INTEGER NOT NULL,
 		email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL	
 	);`
