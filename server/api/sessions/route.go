@@ -1,4 +1,4 @@
-package user
+package sessions
 
 import (
 	"database/sql"
@@ -10,62 +10,55 @@ import (
 	"github.com/gofrs/uuid/v5"
 )
 
-type User struct {
+type Session struct {
 	ID string `json:"id"`
-	Username string `json:"username"`
-	First_name string `json:"first_name"`
-	Last_name string `json:"last_name"`
-	Gender string `json:"gender"`
-	Age int `json:"age"`
-	Email string `json:"email"`
-	Password string `json:"password"`
+	UserID string    `json:"user_id"`
 }
 
 func Post(w http.ResponseWriter, r *http.Request, db *sql.DB){
-	var usr User	
+	var session Session	
 
-	err := json.NewDecoder(r.Body).Decode(&usr)
+	err := json.NewDecoder(r.Body).Decode(&session)
 	if err != nil {
     http.Error(w, err.Error(), http.StatusBadRequest)
     return
   }
 
-	if usr.Password == "" {
+	if session.UserID == "" {
         http.Error(w, "Missing fields in request", http.StatusBadRequest)
         return
   }
-	
 
 	var u1 = uuid.Must(uuid.NewV4())
 	
-	_, err = db.Exec("INSERT INTO users (id,username,first_name,last_name,gender,age,email,password) VALUES (?,?,?,?,?,?,?,?)", u1,usr.Username, usr.First_name, usr.Last_name, usr.Gender, usr.Age, usr.Email, usr.Password)
+	_, err = db.Exec("INSERT INTO sessions (id,user_id) VALUES (?,?)", u1,session.UserID)
 	if err != nil {
     http.Error(w, err.Error(), http.StatusInternalServerError)
     return
   }
 
-	fmt.Println("User added successfuly !")
+	fmt.Println("Session added successfuly !")
 }
 
 func Get(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	rows, err := db.Query("SELECT id, username,first_name,last_name,gender,age,email,password FROM users")
+	rows, err := db.Query("SELECT id, user_id FROM sessions")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
 
-	var users []User
+	var sessions []Session
 	for rows.Next() {
-		var usr User
-		err = rows.Scan(&usr.ID, &usr.Username, &usr.First_name, &usr.Last_name, &usr.Gender, &usr.Age, &usr.Email, &usr.Password)
+		var session Session
+		err = rows.Scan(&session.ID, &session.UserID)
 		if err != nil {
 			log.Fatal(err)
 		}
-		users = append(users, usr)
+		sessions = append(sessions, session)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	json.NewEncoder(w).Encode(sessions)
 }
 
 func Put(w http.ResponseWriter, r *http.Request) {
