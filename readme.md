@@ -6,4 +6,4 @@
 
 #### Shema DB :
 
-![Shema DB](/assets/img/Shéma%20DB%20real-time-forum.png)
+![Shema DB](/assets/img//DBshem.png)
