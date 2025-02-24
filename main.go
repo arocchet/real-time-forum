@@ -7,6 +7,7 @@ import (
 	comment "main/server/api/comment"
 	post "main/server/api/post"
 	privatemsg "main/server/api/private_msg"
+	"main/server/api/sessions"
 	user "main/server/api/user"
 	"main/server/handlers"
 	"net/http"
@@ -39,13 +40,28 @@ func main() {
 	mux.HandleFunc("/api/user", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			user.Get(w, r)
+			user.Get(w, r, db)
 		case "POST":
-			user.Post(w, r)
+			user.Post(w, r, db)
 		case "PUT":
 			user.Put(w, r)
 		case "DELETE":
 			user.Delete(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
+	mux.HandleFunc("/api/sessions", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			sessions.Get(w, r, db)
+		case "POST":
+			sessions.Post(w, r, db)
+		case "PUT":
+			sessions.Put(w, r)
+		case "DELETE":
+			sessions.Delete(w, r)
 		default:
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		}

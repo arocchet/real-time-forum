@@ -20,6 +20,7 @@ func Init() (*sql.DB,error) {
 	CreatePrivateMsg(db)
 	CreateComments(db)
 	CreatePosts(db)
+	CreateSessions(db)
 
 	return db,nil
 }
@@ -27,7 +28,7 @@ func Init() (*sql.DB,error) {
 func CreateUser(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS users(
-		id VARCHAR(55) PRIMARY KEY,
+		id VARCHAR(55) PRIMARY KEY NOT NULL UNIQUE,
 		username TEXT NOT NULL UNIQUE,
 		first_name TEXT NOT NULL,
 		last_name TEXT NOT NULL,
@@ -114,4 +115,18 @@ func CreateCategories(db *sql.DB) {
     log.Fatal(err)
   }
 	log.Println("Table 'categories' created successfully")
+}
+
+func CreateSessions(db *sql.DB) {
+	query := `
+    CREATE TABLE IF NOT EXISTS sessions (
+        id VARCHAR(55) PRIMARY KEY NOT NULL UNIQUE,
+				user_id VARCHAR(55) NOT NULL UNIQUE
+    );`
+
+	_, err := db.Exec(query)
+	if err != nil {
+    log.Fatal(err)
+  }
+	log.Println("Table 'sessions' created successfully")
 }
