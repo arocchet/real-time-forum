@@ -5,60 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Real-Time-Forum</title>
     <link rel="stylesheet" href="/static/styles/style.css" />
+    <script type="module" src="/static/scripts/main.js" defer></script>
+    <script
+      type="text/javascript"
+      src="/static/scripts/style.js"
+      defer
+    ></script>
   </head>
   <body class="dark-theme">
-    <div id="container" class="container">
+    <nav id="sidebar">
+      <ul>
+        <li>
+          <span class="logo">RTF</span>
+          <button onclick="toggleSidebar()" id="toggle-btn">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24px"
+              viewBox="0 -960 960 960"
+              width="24px"
+              fill="#e8eaed"
+            >
+              <path
+                d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"
+              />
+            </svg>
+          </button>
+        </li>
 
+        <li>
+          <div class="a">
+            <svg
+              role="img"
+              width="24px"
+              viewBox="0 0 130 130"
+              aria-label="icon"
+            >
+              <path
+                fill="var(--neutral)"
+                stroke="var(--neutral)"
+                stroke-width="0.5px"
+                d="M 124.2993 31.031 C 124.2967 30.7549 124.2492 30.4815 124.1594 30.2228 V 30.0261 C 124.067 29.8308 123.9489 29.6495 123.8103 29.487 L 123.4842 29.2178 C 123.343 29.0839 123.1866 28.9689 123.0183 28.8747 H 122.7853 C 122.5332 28.7241 122.2573 28.6243 121.9702 28.5804 H 8.9945 C 8.7777 28.5483 8.5583 28.5483 8.3421 28.5804 C 8.1717 28.5609 8 28.5609 7.8297 28.5804 C 6.5429 28.5804 5.5 29.6781 5.5 31.0311 V 99.1281 C 5.508 99.4132 5.563 99.695 5.6631 99.961 V 100.157 C 5.7725 100.4105 5.9223 100.6421 6.1059 100.8428 C 6.2193 100.9622 6.3439 101.0691 6.4785 101.1615 H 6.8975 C 7.1501 101.2671 7.4179 101.3252 7.6897 101.3331 H 7.8296 L 121.9709 101.6763 H 121.9702 C 122.588 101.6763 123.1806 101.4183 123.6176 100.9589 C 124.0545 100.4989 124.3 99.8759 124.3 99.2258 V 99.0786 V 98.8581 L 124.2993 31.031 Z M 75.196 76.2904 L 113.049 96.9712 L 17.5424 96.6768 L 55.7451 76.1906 L 64.0379 83.5419 C 64.9097 84.3264 66.1945 84.3264 67.0663 83.5419 L 75.196 76.2904 Z M 79.0167 72.8599 L 119.6411 36.3486 V 95.1582 L 79.0167 72.8599 Z M 115.658 33.4814 L 73.4028 71.4638 L 65.4823 78.5695 L 15.3079 33.4815 L 115.658 33.4814 Z M 10.1585 35.319 L 51.8556 72.6872 L 10.1585 95.1087 V 35.319 Z"
+                style="transition: stroke 0.2s ease-out, opacity 0.2s ease-out"
+              ></path>
+            </svg>
+            <span>Messages</span>
+          </div>
+        </li>
+        <li>
+          <div class="a">
+            <svg
+              role="img"
+              width="24px"
+              viewBox="0 0 130 130"
+              aria-label="icon"
+            >
+              <g fill="none" stroke="var(--neutral)" stroke-width="6px">
+                <circle cx="64" cy="42" r="34"></circle>
+                <path d="M81 72c18 6 32 27 32 50H17c0-23 13-43 31-50"></path>
+              </g>
+            </svg>
+            <span>Profile</span>
+          </div>
+        </li>
+        <li id="switch-theme" class="switch-theme">
+          <div class="a">
+            <svg
+              id="theme-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              focusable="false"
+              height="24"
+              role="presentation"
+              viewBox="0 0 24 24"
+              width="24"
+              fill="currentColor"
+            >
+              <g>
+                <path
+                  id="sun-icon"
+                  d="M19 12a7 7 0 11-7-7 7 7 0 017 7z M12 22.96a.969.969 0 01-1-.96v-.08a1 1 0 012 0 1.038 1.038 0 01-1 1.04zm7.14-2.82a1.024 1.024 0 01-.71-.29l-.13-.13a1 1 0 011.41-1.41l.13.13a1 1 0 010 1.41.984.984 0 01-.7.29zm-14.28 0a1.024 1.024 0 01-.71-.29 1 1 0 010-1.41l.13-.13a1 1 0 011.41 1.41l-.13.13a1 1 0 01-.7.29zM22 13h-.08a1 1 0 010-2 1.038 1.038 0 011.04 1 .969.969 0 01-.96 1zM2.08 13H2a1 1 0 010-2 1.038 1.038 0 011.04 1 .969.969 0 01-.96 1zm16.93-7.01a1.024 1.024 0 01-.71-.29 1 1 0 010-1.41l.13-.13a1 1 0 011.41 1.41l-.13.13a.984.984 0 01-.7.29zm-14.02 0a1.024 1.024 0 01-.71-.29l-.13-.14a1 1 0 011.41-1.41l.13.13a1 1 0 010 1.41.97.97 0 01-.7.3zM12 3.04a.969.969 0 01-1-.96V2a1 1 0 012 0 1.038 1.038 0 01-1 1.04z"
+                />
+                <path
+                  id="moon-icon"
+                  d="M21.53 15.93c-.16-.27-.61-.69-1.73-.49a8.46 8.46 0 01-1.88.13 8.409 8.409 0 01-5.91-2.82 8.068 8.068 0 01-1.44-8.66c.44-1.01.13-1.54-.09-1.76s-.77-.55-1.83-.11a10.318 10.318 0 00-6.32 10.21 10.475 10.475 0 007.04 8.99 10 10 0 002.89.55c.16.01.32.02.48.02a10.5 10.5 0 008.47-4.27c.67-.93.49-1.519.32-1.79z"
+                />
+              </g>
+            </svg>
+            <span>Theme</span>
+          </div>
+        </li>
+      </ul>
+    </nav>
+    <main>
       <div id="modal" class="modal" style="display: none">
         <div class="modal-content">
           <span id="close-modal" class="close-btn">&times;</span>
-          <div id="modal-body">
-            
-          </div>
-          <div id="modal-footer">
-            
-          </div>
+          <div id="modal-body"></div>
+          <div id="modal-footer"></div>
         </div>
       </div>
 
-      <div id="banner" class="banner"></div>
-
-      <div id="sidebar" class="sidebar">
-        <button id="login-btn" class="login-btn"><svg role="img" width="40px" viewBox="0 0 130 130" aria-label="icon"><g fill="none" stroke="var(--neutral)" stroke-width="3px"><circle cx="64" cy="42" r="34"></circle><path d="M81 72c18 6 32 27 32 50H17c0-23 13-43 31-50"></path></g></svg></button>
+      <div id="new-post" class="new-post">+</div>
+      <button id="login-btn" class="login-btn2"><svg role="img" width="40px" viewBox="0 0 130 130" aria-label="icon"><g fill="none" stroke="var(--neutral)" stroke-width="3px"><circle cx="64" cy="42" r="34"></circle><path d="M81 72c18 6 32 27 32 50H17c0-23 13-43 31-50"></path></g></svg></button>
         <button id="logout-btn" class="logout-btn" style="display:none;"><svg role="img" width="40px" viewBox="0 0 130 130" aria-label="icon"><path fill="none" stroke="var(--neutral)" stroke-width="3px" d="M85 21.81a51.5 51.5 0 1 1-39.4-.34M64.5 10v51.66" style="transition: stroke 0.2s ease-out, opacity 0.2s ease-out;"></path></svg></button>
-      </div>
-      <main id="main" class="main">Main</main>
 
-      <div id="rightside" class="rightside">
-        <div id="switch-theme" class="switch-theme">
-          <svg
-            id="theme-icon"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-            focusable="false"
-            height="24"
-            role="presentation"
-            viewBox="0 0 24 24"
-            width="24"
-            fill="currentColor"
-          >
-            <g>
-              <path
-                id="sun-icon"
-                d="M19 12a7 7 0 11-7-7 7 7 0 017 7z M12 22.96a.969.969 0 01-1-.96v-.08a1 1 0 012 0 1.038 1.038 0 01-1 1.04zm7.14-2.82a1.024 1.024 0 01-.71-.29l-.13-.13a1 1 0 011.41-1.41l.13.13a1 1 0 010 1.41.984.984 0 01-.7.29zm-14.28 0a1.024 1.024 0 01-.71-.29 1 1 0 010-1.41l.13-.13a1 1 0 011.41 1.41l-.13.13a1 1 0 01-.7.29zM22 13h-.08a1 1 0 010-2 1.038 1.038 0 011.04 1 .969.969 0 01-.96 1zM2.08 13H2a1 1 0 010-2 1.038 1.038 0 011.04 1 .969.969 0 01-.96 1zm16.93-7.01a1.024 1.024 0 01-.71-.29 1 1 0 010-1.41l.13-.13a1 1 0 011.41 1.41l-.13.13a.984.984 0 01-.7.29zm-14.02 0a1.024 1.024 0 01-.71-.29l-.13-.14a1 1 0 011.41-1.41l.13.13a1 1 0 010 1.41.97.97 0 01-.7.3zM12 3.04a.969.969 0 01-1-.96V2a1 1 0 012 0 1.038 1.038 0 01-1 1.04z"
-              />
-              <path
-                id="moon-icon"
-                d="M21.53 15.93c-.16-.27-.61-.69-1.73-.49a8.46 8.46 0 01-1.88.13 8.409 8.409 0 01-5.91-2.82 8.068 8.068 0 01-1.44-8.66c.44-1.01.13-1.54-.09-1.76s-.77-.55-1.83-.11a10.318 10.318 0 00-6.32 10.21 10.475 10.475 0 007.04 8.99 10 10 0 002.89.55c.16.01.32.02.48.02a10.5 10.5 0 008.47-4.27c.67-.93.49-1.519.32-1.79z"
-              />
-            </g>
-          </svg>
-        </div>
-        <div id="new-post" class="new-post">+</div>
+      <div class="post">
+        <h2>Hello World</h2>
+        <p>
+          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veritatis
+          porro iure quaerat aliquam! Optio dolorum in eum provident, facilis
+          error repellendus excepturi enim dolor deleniti adipisci consectetur
+          doloremque, unde maiores odit sapiente.
+        </p>
       </div>
-
-      <div id="low-content" class="low-content"></div>
-    </div>
+      <div class="post">
+        <h2>Example Heading</h2>
+        <p>
+          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Hic aliquid
+          corrupti, tenetur fuga magnam necessitatibus blanditiis quod sint
+          excepturi laborum esse alias labore molestias adipisci, nostrum
+          corporis ex maiores quis dolore quidem asperiores odio ad fugit eos!
+          Delectus modi quas ipsa deleniti consequuntur nihil, hic in ipsum
+        </p>
+      </div>
+      <div class="post">
+        <h2>Lorem Ipsum</h2>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore
+          repudiandae labore veniam reprehenderit voluptatum, laboriosam
+          perferendis fuga, dolore quam quas nostrum totam sunt esse expedita.
+        </p>
+      </div>
+    </main>
   </body>
-  <script type="module" src="/static/scripts/main.js" defer></script>
 </html>

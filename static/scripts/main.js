@@ -1,23 +1,22 @@
-window.addEventListener('DOMContentLoaded', (event) => {
-  const logoutBtn = document.getElementById('logout-btn');
-  
+window.addEventListener("DOMContentLoaded", (event) => {
+  const logoutBtn = document.getElementById("logout-btn");
+
   // Fonction qui vérifie la présence du cookie "session"
   function checkSessionCookie() {
-      const sessionCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('session'));
-      
-      // Si le cookie "session" existe, on affiche le bouton
-      if (sessionCookie) {
-          logoutBtn.style.display = 'flex';
-      } else {
-          logoutBtn.style.display = 'none';
-      }
+    const sessionCookie = document.cookie
+      .split(";")
+      .find((cookie) => cookie.trim().startsWith("session="));
+
+    if (sessionCookie) {
+      logoutBtn.style.display = "flex";
+    } else {
+      logoutBtn.style.display = "none";
+    }
   }
 
   checkSessionCookie();
 });
-
-
-// Theme
+// Theme Switch
 const themeSwitch = document.getElementById("switch-theme");
 const themeIcon = document.getElementById("theme-icon");
 const sunIcon = document.getElementById("sun-icon");
@@ -49,7 +48,7 @@ const modal = document.getElementById("modal");
 const closeModal = document.getElementById("close-modal");
 const modalBody = document.getElementById("modal-body");
 const modalFooter = document.getElementById("modal-footer");
-const logoutBtn = document.getElementById('logout-btn');
+const logoutBtn = document.getElementById("logout-btn");
 
 // Contenus pour chaque modal
 const loginContent = `
