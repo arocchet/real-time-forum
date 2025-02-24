@@ -1,4 +1,4 @@
-package post
+package privatemsg
 
 import (
 	"database/sql"
@@ -8,59 +8,58 @@ import (
 	"net/http"
 )
 
-type Poste struct {
+type Message struct {
 	ID int `json:"id"`
-	Post_user_id int `json:"post_user_id"`
-	Category_id int `json:"category_id"`
-	Date string `json:"date"`
-	Title string `json:"title"`
+	Sender_id  int `json:"sender_id"`
+	Receiver_id int `json:"receiver_id"`
 	Content string `json:"content"`
+	Date string `json:"date"`
 }
 
 func Post(w http.ResponseWriter, r *http.Request, db *sql.DB){
-	var poste Poste	
+	var msg Message	
 
-	err := json.NewDecoder(r.Body).Decode(&poste)
+	err := json.NewDecoder(r.Body).Decode(&msg)
 	if err != nil {
     http.Error(w, err.Error(), http.StatusBadRequest)
     return
   }
 
-	if poste.Content == "" {
+	if msg.Content == "" {
         http.Error(w, "Missing fields in request", http.StatusBadRequest)
         return
   }
 	
-	_, err = db.Exec("INSERT INTO posts (post_user_id,category_id,title,content) VALUES (?,?,?,?)", poste.Post_user_id, poste.Category_id, poste.Title, poste.Content)
+	_, err = db.Exec("INSERT INTO private_msg (sender_id,receiver_id,content) VALUES (?,?,?)", msg.Sender_id, msg.Receiver_id, msg.Content)
 	if err != nil {
     http.Error(w, err.Error(), http.StatusInternalServerError)
     return
   }
 
-	fmt.Println("Post added successfuly !")
+	fmt.Println("Message added successfuly !")
 }
 
 func Get(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	rows, err := db.Query("SELECT id, post_user_id, category_id, title, content, date FROM posts")
+	rows, err := db.Query("SELECT id, sender_id, receiver_id, content, date FROM private_msg")
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	defer rows.Close()
 
-	var posts []Poste
+	var messages []Message
 	for rows.Next() {
-		var post Poste
-		err = rows.Scan(&post.ID, &post.Post_user_id, &post.Category_id,&post.Title,  &post.Content, &post.Date)
+		var msg Message
+		err = rows.Scan(&msg.ID, &msg.Sender_id, &msg.Receiver_id, &msg.Content, &msg.Date)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		posts = append(posts, post)
+		messages = append(messages, msg)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(posts)
+	json.NewEncoder(w).Encode(messages)
 }
 
 func Put(w http.ResponseWriter, r *http.Request) {

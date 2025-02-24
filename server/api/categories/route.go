@@ -1,4 +1,4 @@
-package post
+package categories
 
 import (
 	"database/sql"
@@ -8,59 +8,55 @@ import (
 	"net/http"
 )
 
-type Poste struct {
+type Category struct {
 	ID int `json:"id"`
-	Post_user_id int `json:"post_user_id"`
-	Category_id int `json:"category_id"`
-	Date string `json:"date"`
-	Title string `json:"title"`
-	Content string `json:"content"`
+	Name  string `json:"name"`
 }
 
 func Post(w http.ResponseWriter, r *http.Request, db *sql.DB){
-	var poste Poste	
+	var cat Category	
 
-	err := json.NewDecoder(r.Body).Decode(&poste)
+	err := json.NewDecoder(r.Body).Decode(&cat)
 	if err != nil {
     http.Error(w, err.Error(), http.StatusBadRequest)
     return
   }
 
-	if poste.Content == "" {
+	if cat.Name == "" {
         http.Error(w, "Missing fields in request", http.StatusBadRequest)
         return
   }
 	
-	_, err = db.Exec("INSERT INTO posts (post_user_id,category_id,title,content) VALUES (?,?,?,?)", poste.Post_user_id, poste.Category_id, poste.Title, poste.Content)
+	_, err = db.Exec("INSERT INTO categories (name) VALUES (?)", cat.Name)
 	if err != nil {
     http.Error(w, err.Error(), http.StatusInternalServerError)
     return
   }
 
-	fmt.Println("Post added successfuly !")
+	fmt.Println("Category added successfuly !")
 }
 
 func Get(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	rows, err := db.Query("SELECT id, post_user_id, category_id, title, content, date FROM posts")
+	rows, err := db.Query("SELECT id, name FROM categories")
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	defer rows.Close()
 
-	var posts []Poste
+	var categories []Category
 	for rows.Next() {
-		var post Poste
-		err = rows.Scan(&post.ID, &post.Post_user_id, &post.Category_id,&post.Title,  &post.Content, &post.Date)
+		var cat Category
+		err = rows.Scan(&cat.ID, &cat.Name)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		posts = append(posts, post)
+		categories = append(categories, cat)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(posts)
+	json.NewEncoder(w).Encode(categories)
 }
 
 func Put(w http.ResponseWriter, r *http.Request) {
