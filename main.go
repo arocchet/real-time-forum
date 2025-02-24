@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	db "main/server/DB"
 	comment "main/server/api/comment"
 	post "main/server/api/post"
 	user "main/server/api/user"
@@ -12,6 +13,8 @@ import (
 )
 
 func main() {
+	db.Init()
+
 	port := "8088" // port par défaut
 
 	// Si un port est passé en argument, on l'utilise
