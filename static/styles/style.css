@@ -138,7 +138,6 @@
 html {
   font-family: "Roboto", sans-serif;
   line-height: 1.5rem;
-
 }
 body {
   min-height: 100vh;
@@ -148,7 +147,6 @@ body {
   display: grid;
   grid-template-columns: auto 1fr;
   transition: 300ms ease-in-out;
-
 }
 #sidebar {
   box-sizing: border-box;
@@ -263,18 +261,34 @@ main p {
   margin-top: 5px;
   margin-bottom: 10px;
 }
+
+main {
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  align-items: center;
+}
+
 .post {
+  position: relative;
   border: 1px solid var(--greyFill);
   border-radius: 1em;
-  margin-top: 2vh;
-  margin-left: 5vw;
-  margin-bottom: 2vh;
-  margin-right: 5vw;
-  padding: min(3em, 15%);
+  padding: min(1em, 5%);
+  max-width: 700px;
+  width: 80%;
 
-  h2,
-  p {
-    margin-top: 0.5em;
+  div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+  }
+
+  .time {
+    position: absolute;
+    top: 0px;
+    font-size: small;
   }
 }
 
@@ -282,7 +296,6 @@ main p {
   display: flex;
   align-items: center;
   justify-content: center;
-
 }
 
 .theme-text {
@@ -292,7 +305,6 @@ main p {
 
 /* Toggle Switch */
 .toggle-switch {
-  
   position: relative;
   display: inline-block;
   width: 40px;
@@ -330,7 +342,7 @@ main p {
 }
 
 input:checked + .slider {
-  background-color: #4CAF50;
+  background-color: #4caf50;
 }
 
 input:checked + .slider:before {
@@ -392,7 +404,6 @@ span {
   border: 0px solid var(--greyFill);
 }
 
-
 .modal {
   display: none; /* Hidden by default */
   position: fixed;
@@ -413,6 +424,10 @@ span {
   width: 80%;
   max-width: 500px;
   position: relative;
+}
+
+.modal-content h2 {
+  margin-bottom: 0.5em;
 }
 
 .close-btn {
@@ -436,17 +451,21 @@ span {
   color: var(--textNeutral);
   border-radius: 10px;
   border: 1px solid var(--greyFill);
+  padding: 5px 15px;
 }
 
 .modal-input {
   border-radius: 10px;
   border: 1px solid var(--greyFill);
+  padding: 4px 7px;
 }
 
 .modal-area {
   border-radius: 10px;
   border: 1px solid var(--greyFill);
   width: 90%;
+  padding: 4px 7px;
+  font-family: "Roboto", sans-serif;
 }
 
 .modal-href {
@@ -455,7 +474,6 @@ span {
 }
 
 @media (max-width: 800px) {
-
   .new-post {
     bottom: 0.5vh;
     right: 1vw;

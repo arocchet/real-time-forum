@@ -1,4 +1,10 @@
-window.addEventListener("DOMContentLoaded", (event) => {
+import { LoadCategories } from "./loadcategories.js";
+import { DisplayPosts, LoadPosts } from "./loadposts.js";
+
+//variable
+let categories = {};
+
+window.addEventListener("DOMContentLoaded", async (event) => {
   const logoutBtn = document.getElementById("logout-btn");
 
   // Fonction qui vérifie la présence du cookie "session"
@@ -13,8 +19,10 @@ window.addEventListener("DOMContentLoaded", (event) => {
       logoutBtn.style.display = "none";
     }
   }
-
+  categories = await LoadCategories();
   checkSessionCookie();
+  const posts = await LoadPosts();
+  DisplayPosts(posts, categories);
 });
 // Theme Switch
 const themeSwitch = document.getElementById("switch-theme");
@@ -118,7 +126,7 @@ const registerFooter = `
 `;
 
 // Fonction pour envoyer des données à l'API
-async function sendData(url, data, login=false) {
+async function sendData(url, data, login = false) {
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -132,10 +140,10 @@ async function sendData(url, data, login=false) {
       throw new Error("Error in API request");
     }
 
-    alert("Request was successful!");
+    console.log(response);
     modal.style.display = "none";
-    if (login){
-      logoutBtn.style.display = 'flex';
+    if (login) {
+      logoutBtn.style.display = "flex";
     }
   } catch (error) {
     console.error("Error:", error);
@@ -143,7 +151,7 @@ async function sendData(url, data, login=false) {
   }
 }
 
-logoutBtn.addEventListener("click", async function() {
+logoutBtn.addEventListener("click", async function () {
   try {
     const response = await fetch("http://localhost:8080/api/sessions", {
       method: "DELETE",
@@ -154,9 +162,10 @@ logoutBtn.addEventListener("click", async function() {
     }
 
     alert("Logout successfully!");
-    document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie =
+      "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     modal.style.display = "none";
-    logoutBtn.style.display = 'none';
+    logoutBtn.style.display = "none";
   } catch (error) {
     console.error("Error:", error);
     alert("There was an error with the request.");
@@ -201,7 +210,7 @@ document.addEventListener("click", (event) => {
 });
 
 // Envoyer les données de Login à l'API
-document.addEventListener("submit", (event) => {
+document.addEventListener("submit", async (event) => {
   if (event.target && event.target.id === "login-form") {
     event.preventDefault();
 
@@ -239,11 +248,14 @@ document.addEventListener("submit", (event) => {
     const body = document.getElementById("post-body").value;
 
     const postData = {
-      title,
-      category,
-      body,
+      title: title,
+      category_name: category,
+      content: body,
     };
 
-    sendData("http://localhost:8080/api/post", postData); // Envoi des données de post
+    await sendData("http://localhost:8080/api/post", postData); // Envoi des données de post
+
+    //reload
+    location.reload();
   }
 });

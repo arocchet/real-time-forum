@@ -88,12 +88,13 @@ func CreatePosts(db *sql.DB) {
 	CREATE TABLE IF NOT EXISTS posts(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		post_user_id INTEGER NOT NULL,
-		category_id INTEGER NOT NULL,
+		post_user_name TEXT NOT NULL,
+		category_name TEXT NOT NULL,
     date DATETIME DEFAULT CURRENT_TIMESTAMP,
 		title TEXT NOT NULL,
     content TEXT NOT NULL,
     FOREIGN KEY(post_user_id) REFERENCES users(id),
-    FOREIGN KEY(category_id) REFERENCES categories(id)	
+    FOREIGN KEY(category_name) REFERENCES categories(name)	
 	);`
 
 	_, err := db.Exec(query)
@@ -106,8 +107,8 @@ func CreatePosts(db *sql.DB) {
 func CreateCategories(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS categories(
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT NOT NULL UNIQUE
+		name TEXT PRIMARY KEY NOT NULL UNIQUE,
+		id INTEGER UNIQUE
 	);`
 
 	_, err := db.Exec(query)
