@@ -1,10 +1,12 @@
 import { LoadCategories } from "./loadcategories.js";
 import { DisplayPosts, LoadPosts } from "./loadposts.js";
+import { connect, disconnect } from "./websocket.js";
 
 //variable
 let categories = {};
 
 window.addEventListener("DOMContentLoaded", async (event) => {
+  connect();
   const logoutBtn = document.getElementById("logout-btn");
 
   // Fonction qui vérifie la présence du cookie "session"
@@ -26,7 +28,6 @@ window.addEventListener("DOMContentLoaded", async (event) => {
 });
 // Theme Switch
 const themeSwitch = document.getElementById("switch-theme");
-const themeIcon = document.getElementById("theme-icon");
 const sunIcon = document.getElementById("sun-icon");
 const moonIcon = document.getElementById("moon-icon");
 
@@ -143,6 +144,7 @@ async function sendData(url, data, login = false) {
     modal.style.display = "none";
     if (login) {
       logoutBtn.style.display = "flex";
+      connect();
     }
   } catch (error) {
     console.error("Error:", error);
@@ -160,7 +162,7 @@ logoutBtn.addEventListener("click", async function () {
       throw new Error("Error in API request");
     }
 
-    alert("Logout successfully!");
+    disconnect();
     document.cookie =
       "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     modal.style.display = "none";
@@ -171,22 +173,27 @@ logoutBtn.addEventListener("click", async function () {
   }
 });
 
-// Ouvrir le modal et afficher le bon contenu selon le bouton cliqué
-loginButton.addEventListener("click", () => {
+export const loginForm = () => {
   modalBody.innerHTML = loginContent;
   modalFooter.innerHTML = loginFooter;
   modal.style.display = "block";
+};
+
+// Ouvrir le modal et afficher le bon contenu selon le bouton cliqué
+loginButton.addEventListener("click", () => {
+  loginForm();
 });
 
 postButton.addEventListener("click", async () => {
-  if (!document.cookie.split("; ").some((cookie) => cookie.startsWith("session="))) {
+  if (
+    !document.cookie.split("; ").some((cookie) => cookie.startsWith("session="))
+  ) {
     modalBody.innerHTML = loginContent;
     modalFooter.innerHTML = loginFooter;
     modal.style.display = "block";
-    console.log("here")
+    console.log("here");
   } else {
     try {
-      console.log("caca")
       const response = await fetch("/api/sessions", {
         method: "GET",
         credentials: "include",

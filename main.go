@@ -12,6 +12,7 @@ import (
 	"main/server/api/sessions"
 	user "main/server/api/user"
 	"main/server/handlers"
+	"main/server/websocket"
 	"net/http"
 	"os"
 	"time"
@@ -147,6 +148,7 @@ func main() {
 		}
 	})
 
+	mux.HandleFunc("/ws", websocket.HandleConnections)
 	// Démarrage du serveur HTTP
 	server := http.Server{
 		Addr:              ":" + port,
