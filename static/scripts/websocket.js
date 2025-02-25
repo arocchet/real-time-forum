@@ -32,11 +32,49 @@ export async function connect() {
     console.log("Connecté au serveur websocket: ", sessionID);
   };
 
-  ws.onmessage = (event) => {};
+  ws.onmessage = (event) => {
+    try {
+      let msg = JSON.parse(event.data);
+
+      if (!msg.sender_id || !msg.content) {
+        console.log("Message mal formaté :", msg);
+        return;
+      }
+
+     // Afficher le message dans le bon chat pour L'AUTRE
+    } catch (error) {
+      console.error("Erreur de parsing JSON:", error);
+    }
+  };
 
   ws.onerror = (error) => console.log("Erreur WebSocket:", error);
 
   ws.onclose = () => console.log("Déconnecté");
+}
+
+export function sendMessage() {
+  let receiverId = document.getElementById("receiverId").value; // A changer par l'ID du destinataire quand on appuie sur la personne en ligne
+  let message = document.getElementById("message").value; // Sera la valeur de l'input du tchat
+
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    alert("Vous n'êtes pas connecté !");
+    return;
+  }
+
+  if (!receiverId || !message) {
+    alert("Veuillez entrer un destinataire et un message !");
+    return;
+  }
+
+  let msg = {
+    sender_id: userId,
+    receiver_id: receiverId,
+    content: message,
+  };
+
+  ws.send(JSON.stringify(msg));
+
+  // Afficher le message dans le bon chat pour MOI
 }
 
 // Fonction pour fermer le WebSocket proprement
