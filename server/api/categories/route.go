@@ -27,7 +27,18 @@ func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	_, err = db.Exec("INSERT INTO categories (name) VALUES (?)", cat.Name)
+	// Retrieve the highest id from the categories table
+	var maxID int
+	err = db.QueryRow("SELECT COALESCE(MAX(id), 0) FROM categories").Scan(&maxID)
+	if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+	};
+
+	// Calculate the new id
+	newID := maxID + 1
+
+	_, err = db.Exec("INSERT INTO categories (name,id) VALUES (?,?)", cat.Name, newID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -65,4 +76,25 @@ func Put(w http.ResponseWriter, r *http.Request) {
 
 func Delete(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Not Implemented", 501)
+}
+
+func NewCategory(name string, db *sql.DB) error{
+	var maxID int
+	err := db.QueryRow("SELECT COALESCE(MAX(id), 0) FROM categories").Scan(&maxID)
+	if err != nil {
+			fmt.Println( err.Error())
+			return err
+	};
+
+	// Calculate the new id
+	newID := maxID + 1
+
+	_, err = db.Exec("INSERT OR IGNORE INTO categories (name,id) VALUES (?,?)", name, newID)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil
+	}
+
+	fmt.Println("Category added successfuly !")
+	return nil
 }
