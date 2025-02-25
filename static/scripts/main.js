@@ -140,7 +140,6 @@ async function sendData(url, data, login = false) {
       throw new Error("Error in API request");
     }
 
-    console.log(response);
     modal.style.display = "none";
     if (login) {
       logoutBtn.style.display = "flex";
@@ -179,11 +178,37 @@ loginButton.addEventListener("click", () => {
   modal.style.display = "block";
 });
 
-// Afficher le formulaire "New Post"
-postButton.addEventListener("click", () => {
-  modalBody.innerHTML = postContent;
-  modalFooter.innerHTML = "";
-  modal.style.display = "block";
+postButton.addEventListener("click", async () => {
+  if (!document.cookie.split("; ").some((cookie) => cookie.startsWith("session="))) {
+    modalBody.innerHTML = loginContent;
+    modalFooter.innerHTML = loginFooter;
+    modal.style.display = "block";
+    console.log("here")
+  } else {
+    try {
+      console.log("caca")
+      const response = await fetch("/api/sessions", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (response.status === 200) {
+        // Si la session est valide, afficher le formulaire "New Post"
+        modalBody.innerHTML = postContent;
+        modalFooter.innerHTML = "";
+        modal.style.display = "block";
+      } else {
+        throw new Error("Session invalide");
+      }
+    } catch (error) {
+      document.cookie =
+        "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+      modalBody.innerHTML = loginContent;
+      modalFooter.innerHTML = loginFooter;
+      modal.style.display = "block";
+    }
+  }
 });
 
 // Fermer le modal si on clique sur la croix
