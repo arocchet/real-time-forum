@@ -341,30 +341,45 @@ input:checked + .slider:before {
   background-color: var(--bgLevel3);
 }
 
-.new-post {
+.a:hover {
+  background-color: var(--bgLevel3);
+}
 
+.new-post {
+  position: fixed;
   display: flex;
   align-items: center;
   justify-content: center;
 
-  margin-bottom: 2vh;
-  margin-right: 1vw;
+  margin-bottom: 0.5vh;
+  margin-right: 0.5vw;
 
-  height: clamp(2rem, 3vmax, 4rem);
-  width: clamp(2rem, 3vmax, 4rem);
+  bottom: 2vh;
+  right: 2vw;
 
-  background-color: var(--greenFill);
+  height: clamp(2.5rem, 3vmax, 4rem);
+  width: clamp(2.5rem, 3vmax, 4rem);
+
+  background-color: var(--purpleFill);
   color: var(--bgLevel2);
 
   font-size: 200%;
   font-weight: lighter;
 
   border-radius: 100%;
-  border: 1px solid var(--greyFill);
+  border: 1px solid var(--detailMinimal);
+
+  user-select: none;
+  cursor: default;
 }
 
 .new-post:hover {
-  background-color: var(--green55);
+  background-color: var(--purpleFillAlt);
+}
+
+span {
+  user-select: none;
+  cursor: default;
 }
 
 .login-btn {
@@ -386,12 +401,12 @@ input:checked + .slider:before {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7); /* Assombrir l'Ã©cran */
+  background-color: rgba(0, 0, 0, 0.8); /* Assombrir l'Ã©cran */
 }
 
 .modal-content {
   background-color: var(--bgLevel2);
-  margin: 35vh auto;
+  margin: 25vh auto;
   padding: 20px;
   border-radius: 10px;
   border: 1px solid var(--greyFill);
@@ -440,6 +455,11 @@ input:checked + .slider:before {
 }
 
 @media (max-width: 800px) {
+
+  .new-post {
+    bottom: 0.5vh;
+    right: 1vw;
+  }
   body {
     grid-template-columns: 1fr;
   }

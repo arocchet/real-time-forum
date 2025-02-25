@@ -55,7 +55,7 @@ const loginContent = `
   <h2>Login</h2>
   <form id="login-form">
     <label for="email">Email:</label>
-    <input class="modal-input" type="text" id="email" name="email" required><br><br>
+    <input class="modal-input" type="email" id="email" name="email" required><br><br>
     <label for="password">Password:</label>
     <input class="modal-input" type="password" id="password" name="password" required><br><br>
     <button class="modal-btn" type="submit">Login</button>
@@ -99,11 +99,11 @@ const postContent = `
   <h2>New Post</h2>
   <form id="post-form">
     <label for="post-title">Title:</label>
-    <input class="modal-input" type="text" id="post-title" name="post-title" required><br><br>
+    <input class="modal-input" type="text" id="post-title" name="post-title" maxlength="20" required><br><br>
     <label for="post-category">Category:</label>
-    <input class="modal-input" type="text" id="post-category" name="post-category" required><br><br>
+    <input class="modal-input" type="text" id="post-category" name="post-category" maxlength="20" required><br><br>
     <label for="post-body">Content:</label><br>
-    <textarea class="modal-area" id="post-body" name="post-body" rows="4" cols="50" required></textarea><br><br>
+    <textarea class="modal-area" id="post-body" name="post-body" rows="4" cols="50" maxlength="200" required></textarea><br><br>
     <button class="modal-btn" type="submit">Post</button>
   </form>
 `;
