@@ -126,6 +126,7 @@
   --bgLevel1: var(--white5);
   --bgLevel2: var(--white10);
   --bgLevel3: var(--white15);
+  --bgLevel4: var(--white15);
 
   --textNeutral: var(--grey90);
   --textMinimal: var(--grey80);
@@ -477,7 +478,7 @@ span {
 
 @media (max-width: 800px) {
   .new-post {
-    bottom: 0.5vh;
+    bottom: 5px;
     right: 1vw;
   }
   body {
@@ -524,6 +525,7 @@ span {
     }
 
     ul li .sub-menu.show {
+      z-index: 10;
       position: fixed;
       bottom: 60px;
       left: 0;
@@ -532,6 +534,7 @@ span {
       width: 100%;
       background-color: var(--bgLevel4);
       border-top: 1px solid var(--greyFill);
+      opacity: 1;
       display: flex;
       justify-content: center;
 

@@ -149,6 +149,15 @@ func main() {
 	})
 
 	mux.HandleFunc("/ws", websocket.HandleConnections)
+	mux.HandleFunc("/api/online-users", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			websocket.Get(w, r, db)
+		case "POST":
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
 	// Démarrage du serveur HTTP
 	server := http.Server{
 		Addr:              ":" + port,

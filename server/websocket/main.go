@@ -1,6 +1,8 @@
 package websocket
 
 import (
+	"database/sql"
+	"encoding/json"
 	"log"
 	"net/http"
 	"sync"
@@ -14,6 +16,7 @@ type Client struct {
 	ID   string
 	Conn *websocket.Conn
 	Send chan Message
+	once sync.Once // <-- Ajout pour éviter les fermetures multiples
 }
 
 // Gestion des connexions WebSocket
@@ -47,11 +50,11 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 		log.Println("Erreur WebSocket:", err)
 		return
 	}
-
 	client := &Client{
 		ID:   id,
 		Conn: conn,
 		Send: make(chan Message),
+		once: sync.Once{},
 	}
 
 	// Ajouter le client à la liste
@@ -133,12 +136,54 @@ func (c *Client) writePump() {
 
 // disconnect supprime un client proprement
 func (c *Client) disconnect() {
+	c.once.Do(func() { // <-- S'assure que ça s'exécute une seule fois
+		clientsMutex.Lock()
+		delete(clients, c.ID)
+		clientsMutex.Unlock()
+
+		close(c.Send)  // Ferme le canal d’envoi
+		c.Conn.Close() // Ferme la connexion WebSocket
+
+		log.Println("Utilisateur déconnecté:", c.ID)
+	})
+}
+
+func Get(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	clientsMutex.Lock()
-	delete(clients, c.ID)
-	clientsMutex.Unlock()
+	defer clientsMutex.Unlock()
 
-	close(c.Send)
-	c.Conn.Close()
+	type UserInfo struct {
+		SessionID string `json:"session_id"`
+		UserID    string `json:"user_id"`
+		Username  string `json:"username"`
+	}
 
-	log.Println("Utilisateur déconnecté:", c.ID)
+	onlineUsers := []UserInfo{}
+
+	for sessionID := range clients {
+		var userID, username string
+
+		// Récupérer l'UUID de l'utilisateur à partir de la session
+		err := db.QueryRow("SELECT user_id FROM sessions WHERE id = ?", sessionID).Scan(&userID)
+		if err != nil {
+			continue // Si la session n'est pas trouvée, on ignore cet utilisateur
+		}
+
+		// Récupérer les informations de l'utilisateur depuis la table users
+		err = db.QueryRow("SELECT username FROM users WHERE id = ?", userID).Scan(&username)
+		if err != nil {
+			continue // Si l'utilisateur n'est pas trouvé, on ignore cet utilisateur
+		}
+
+		// Ajouter l'utilisateur en ligne à la liste
+		onlineUsers = append(onlineUsers, UserInfo{
+			SessionID: sessionID,
+			UserID:    userID,
+			Username:  username,
+		})
+	}
+
+	// Encoder la réponse en JSON
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(onlineUsers)
 }

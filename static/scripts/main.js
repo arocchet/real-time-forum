@@ -1,32 +1,9 @@
 import { LoadCategories } from "./loadcategories.js";
 import { DisplayPosts, LoadPosts } from "./loadposts.js";
-import { connect, disconnect } from "./websocket.js";
+import { connect, disconnect, getOnlineUsers } from "./websocket.js";
 
-//variable
-let categories = {};
-
-window.addEventListener("DOMContentLoaded", async (event) => {
-  connect();
-  const logoutBtn = document.getElementById("logout-btn");
-
-  // Fonction qui vérifie la présence du cookie "session"
-  function checkSessionCookie() {
-    const sessionCookie = document.cookie
-      .split(";")
-      .find((cookie) => cookie.trim().startsWith("session="));
-
-    if (sessionCookie) {
-      logoutBtn.style.display = "flex";
-    } else {
-      logoutBtn.style.display = "none";
-    }
-  }
-  categories = await LoadCategories();
-  checkSessionCookie();
-  const posts = await LoadPosts();
-  DisplayPosts(posts, categories);
-});
 // Theme Switch
+const logoutBtn = document.getElementById("logout-btn");
 const themeSwitch = document.getElementById("switch-theme");
 const sunIcon = document.getElementById("sun-icon");
 const moonIcon = document.getElementById("moon-icon");
@@ -41,7 +18,42 @@ function setThemeIcons() {
   }
 }
 
-setThemeIcons();
+// Fonction qui vérifie la présence du cookie "session"
+function checkSessionCookie() {
+  const sessionCookie = document.cookie
+    .split(";")
+    .find((cookie) => cookie.trim().startsWith("session="));
+
+  if (sessionCookie) {
+    logoutBtn.style.display = "flex";
+  } else {
+    logoutBtn.style.display = "none";
+  }
+}
+
+//variable
+let categories = {};
+
+window.addEventListener("DOMContentLoaded", async (event) => {
+  setThemeIcons();
+
+  // Connexion au websocket
+  connect();
+  getOnlineUsers()
+
+  // Charger les catégories
+  categories = await LoadCategories();
+  checkSessionCookie();
+
+  // Afficher les posts
+  const posts = await LoadPosts();
+  DisplayPosts(posts, categories);
+
+  setInterval(() => {
+    console.log("passage dans l'interval")
+    getOnlineUsers()
+  }, 3000)
+});
 
 themeSwitch.addEventListener("click", () => {
   document.body.classList.toggle("dark-theme");
@@ -57,7 +69,6 @@ const modal = document.getElementById("modal");
 const closeModal = document.getElementById("close-modal");
 const modalBody = document.getElementById("modal-body");
 const modalFooter = document.getElementById("modal-footer");
-const logoutBtn = document.getElementById("logout-btn");
 
 // Contenus pour chaque modal
 const loginContent = `
@@ -291,3 +302,29 @@ document.addEventListener("submit", async (event) => {
     location.reload();
   }
 });
+
+function closeAllSubMenus() {
+  Array.from(sidebar.getElementsByClassName("show")).forEach((ul) => {
+    ul.classList.remove("show");
+    ul.previousElementSibling.classList.remove("rotate");
+  });
+}
+
+const onlineButton = document.getElementById("online-btn");
+onlineButton.addEventListener("click", () => {
+  toggleSubMenu(onlineButton);
+});
+
+function toggleSubMenu(button) {
+  if (!button.nextElementSibling.classList.contains("show")) {
+    closeAllSubMenus();
+  }
+
+  button.nextElementSibling.classList.toggle("show");
+  button.classList.toggle("rotate");
+
+  if (sidebar.classList.contains("close")) {
+    sidebar.classList.toggle("close");
+    toggleButton.classList.toggle("rotate");
+  }
+}
