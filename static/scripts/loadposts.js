@@ -64,20 +64,57 @@ export function DisplayPosts(posts, categories) {
     postElement.appendChild(head);
     postElement.appendChild(body);
 
-    postElement.addEventListener("click", () => {
-      displayComment(post);
+    postElement.addEventListener("click", async () => {
+      let comments = await GetComments(post.id);
+      displayComment(post, comments);
     });
 
     main.appendChild(postElement);
   });
 }
 
-function displayComment(post) {
+function displayComment(post, comments) {
   const modal = document.getElementById("modal");
   const modalBody = document.getElementById("modal-body");
   const modalFooter = document.getElementById("modal-footer");
+
+  const input = document.createElement("input");
+  input.classList.add("comment-input");
+  input.setAttribute("type", "text");
+  input.setAttribute("placeholder", "Write a comment...");
+  modalFooter.appendChild(input);
+
+  const submitBtn = document.createElement("button");
+  submitBtn.classList.add("comment-btn");
+  submitBtn.textContent = "Send";
+  submitBtn.addEventListener("click", async () => {});
+  modalFooter.appendChild(submitBtn);
+
   modal.style.display = "flex";
-  modalBody.innerHTML = ``
-  modalFooter.innerHTML = ``
-  modalBody.innerHTML = `<p class="modal-area"> ${JSON.stringify(post)} </p>`
+  modalBody.innerHTML = ``;
+  modalFooter.innerHTML = ``;
+  modalBody.innerHTML = `<p class="modal-area"> ${
+    (JSON.stringify(post), comments)
+  } </p>`;
 }
+
+async function GetComments(postID) {
+  try {
+    const response = await fetch(`/api/comment?id=${postID}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Error in API request");
+    }
+    console.log(response);
+    return await response.json();
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+async function sendComment(inputArea) {}

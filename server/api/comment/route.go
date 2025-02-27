@@ -40,9 +40,22 @@ func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
 func Get(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	rows, err := db.Query("SELECT id, parent_post, sender_id, date, content FROM comments")
-	if err != nil {
-		log.Fatal(err)
+	var rows *sql.Rows
+	var err error
+
+	id := r.URL.Query().Get("id")
+	if id != "" {
+		rows, err = db.Query("SELECT id, parent_post, sender_id, date, content FROM comments WHERE id =?", id)
+    if err != nil {
+      http.Error(w, err.Error(), http.StatusNotFound)
+      return
+    }
+
+	}else{
+		rows, err = db.Query("SELECT id, parent_post, sender_id, date, content FROM comments")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	defer rows.Close()
 
