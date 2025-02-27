@@ -1,7 +1,6 @@
 import { LoadCategories } from "./loadcategories.js";
 import { DisplayPosts, LoadPosts } from "./loadposts.js";
 import { connect, disconnect, getOnlineUsers } from "./websocket.js";
-import { SetUserClickEvent } from "./privateMessages.js";
 
 // Theme Switch
 const logoutBtn = document.getElementById("logout-btn");
@@ -50,12 +49,9 @@ window.addEventListener("DOMContentLoaded", async (event) => {
   const posts = await LoadPosts();
   DisplayPosts(posts, categories);
 
-  SetUserClickEvent();
-
   setInterval(() => {
     console.log("passage dans l'interval");
     getOnlineUsers();
-    SetUserClickEvent();
   }, 3000);
 });
 
