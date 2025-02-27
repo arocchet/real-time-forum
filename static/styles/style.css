@@ -290,7 +290,24 @@ main {
   .time {
     position: absolute;
     top: 0px;
-    font-size: small;
+    font-size: 0.5em;
+  }
+
+  .post-head {
+    position: relative;
+    margin-bottom: 15px;
+  }
+
+  .category {
+    position: absolute;
+    right: 0;
+    top: 3px;
+  }
+
+  .post-user-name {
+    position: absolute;
+    left: 0;
+    top: 3px;
   }
 }
 
