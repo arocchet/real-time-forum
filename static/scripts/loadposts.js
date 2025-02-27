@@ -64,6 +64,20 @@ export function DisplayPosts(posts, categories) {
     postElement.appendChild(head);
     postElement.appendChild(body);
 
+    postElement.addEventListener("click", () => {
+      displayComment(post);
+    });
+
     main.appendChild(postElement);
   });
+}
+
+function displayComment(post) {
+  const modal = document.getElementById("modal");
+  const modalBody = document.getElementById("modal-body");
+  const modalFooter = document.getElementById("modal-footer");
+  modal.style.display = "flex";
+  modalBody.innerHTML = ``
+  modalFooter.innerHTML = ``
+  modalBody.innerHTML = `<p class="modal-area"> ${JSON.stringify(post)} </p>`
 }
