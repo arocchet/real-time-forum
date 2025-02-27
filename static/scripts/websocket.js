@@ -135,7 +135,7 @@ export async function getOnlineUsers() {
 
       // Création de la div contenant le SVG + Nom de l'utilisateur
       listItem.innerHTML = `
-        <div class="a">
+        <div class="a connected-user">
           <svg role="img" width="24px" viewBox="0 0 24 24" aria-label="icon">
             <g fill="var(--greenFill)">
               <path d="M18.9773 8.99844L10.7749 17.4458L5.22394 12.2751L5.85311 11.5997L10.7425 16.1542L18.3151 8.3554L18.9773 8.99844Z"></path>

@@ -317,6 +317,10 @@ main {
   justify-content: center;
 }
 
+div.a.connected-user {
+  cursor: pointer;
+}
+
 .theme-text {
   color: var(--neutral);
   font-size: 14px;
@@ -595,6 +599,9 @@ span {
 }
 
 .logout-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
   align-self: flex-end;
   display: flex;
   align-items: center;
@@ -621,4 +628,32 @@ span {
 
 .logout-btn:hover {
   background-color: var(--red35);
+}
+
+#new-msg-container {
+  position: fixed;
+  padding: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  bottom: 20px;
+  width: 80%;
+  max-width: 700px;
+
+  input {
+    background: var(--bgLevel5);
+    flex-grow: 1;
+    padding: 0.8em;
+    color: var(--textNeutral);
+    border-radius: 5px;
+  }
+
+  button {
+    background: var(--bgLevel4);
+    padding: 0.8em;
+    height: 100%;
+    color: var(--textNeutral);
+    border-radius: 5px;
+  }
 }

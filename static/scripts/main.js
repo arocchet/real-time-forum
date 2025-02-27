@@ -1,6 +1,7 @@
 import { LoadCategories } from "./loadcategories.js";
 import { DisplayPosts, LoadPosts } from "./loadposts.js";
 import { connect, disconnect, getOnlineUsers } from "./websocket.js";
+import { SetUserClickEvent } from "./privateMessages.js";
 
 // Theme Switch
 const logoutBtn = document.getElementById("logout-btn");
@@ -39,7 +40,7 @@ window.addEventListener("DOMContentLoaded", async (event) => {
 
   // Connexion au websocket
   connect();
-  getOnlineUsers()
+  getOnlineUsers();
 
   // Charger les catégories
   categories = await LoadCategories();
@@ -49,10 +50,13 @@ window.addEventListener("DOMContentLoaded", async (event) => {
   const posts = await LoadPosts();
   DisplayPosts(posts, categories);
 
+  SetUserClickEvent();
+
   setInterval(() => {
-    console.log("passage dans l'interval")
-    getOnlineUsers()
-  }, 3000)
+    console.log("passage dans l'interval");
+    getOnlineUsers();
+    SetUserClickEvent();
+  }, 3000);
 });
 
 themeSwitch.addEventListener("click", () => {
