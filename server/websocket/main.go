@@ -91,6 +91,7 @@ func (c *Client) readPump() {
 			}
 			break
 		}
+		log.Println(msg)
 
 		// Envoyer au bon destinataire
 		clientsMutex.Lock()

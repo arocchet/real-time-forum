@@ -25,6 +25,7 @@ export async function connect() {
   }
 
   let sessionID = sessionCookie.split("=")[1];
+  userId = sessionID;
 
   ws = new WebSocket(`ws://localhost:8080/ws?uuid=${sessionID}`);
 
@@ -42,6 +43,11 @@ export async function connect() {
       }
 
       // Afficher le message dans le bon chat pour L'AUTRE
+      const main = document.querySelector("main");
+      let messageElement = document.createElement("div");
+      messageElement.textContent = msg.content;
+
+      main.appendChild(messageElement);
     } catch (error) {
       console.error("Erreur de parsing JSON:", error);
     }
@@ -53,15 +59,18 @@ export async function connect() {
 }
 
 export function sendMessage() {
-  let receiverId = document.getElementById("receiverId").value; // A changer par l'ID du destinataire quand on appuie sur la personne en ligne
+  const main = document.querySelector("main");
+  let receiverId = main.id; // A changer par l'ID du destinataire quand on appuie sur la personne en ligne
   let message = document.getElementById("message").value; // Sera la valeur de l'input du tchat
+
+  console.log(message);
 
   if (!ws || ws.readyState !== WebSocket.OPEN) {
     alert("Vous n'êtes pas connecté !");
     return;
   }
 
-  if (!receiverId || !message) {
+  if (!message) {
     alert("Veuillez entrer un destinataire et un message !");
     return;
   }
@@ -75,6 +84,9 @@ export function sendMessage() {
   ws.send(JSON.stringify(msg));
 
   // Afficher le message dans le bon chat pour MOI
+  let messageElement = document.createElement("div");
+  messageElement.textContent = msg.content;
+  main.appendChild(messageElement);
 }
 
 // Fonction pour fermer le WebSocket proprement
@@ -148,6 +160,7 @@ export async function getOnlineUsers() {
 
       listItem.addEventListener("click", () => {
         const main = document.querySelector("main");
+        main.id = data.session_id;
         main.innerHTML = `
         <div id="new-post" class="new-post" style="display:none">+</div>
         <button id="logout-btn" class="logout-btn">
@@ -163,9 +176,14 @@ export async function getOnlineUsers() {
         </button>
         <div class="new-msg">MESSAGE</div>
         <div id="new-msg-container">
-          <input type="text" placeholder="Message ..."></input>
+          <input id="message" type="text" placeholder="Message ..."></input>
           <button id="send-msg">Send</button> 
         </div>`;
+
+        let sendBtn = document.getElementById("send-msg");
+        sendBtn.addEventListener("click", () => {
+          sendMessage();
+        });
       });
 
       // Ajoute l'élément à la liste
