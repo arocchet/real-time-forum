@@ -62,17 +62,18 @@ func Get(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	if err == sql.ErrNoRows {
 		cookie.MaxAge = -1
 		http.SetCookie(w, cookie)
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("Invalid session"))
+		http.Error(w, "Invalid session", http.StatusUnauthorized)
 		return
 	} else if err != nil {
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Valid session"))
+	json.NewEncoder(w).Encode(session)
 }
+
 func Put(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Not Implemented", 501)
 }
