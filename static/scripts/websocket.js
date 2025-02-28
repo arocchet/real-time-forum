@@ -33,7 +33,10 @@ export async function connect() {
     const userData = await response.json();
     userId = userData.user_id; // Supposons que l'API renvoie un objet avec user_id
   } catch (error) {
-    console.error("Erreur lors de la récupération des informations utilisateur:", error);
+    console.error(
+      "Erreur lors de la récupération des informations utilisateur:",
+      error
+    );
     clearSession();
     loginForm();
     return;
@@ -44,7 +47,7 @@ export async function connect() {
   ws.onopen = () => {
     console.log("Connecté au serveur websocket avec session ID:", sessionId);
     console.log("ID utilisateur associé:", userId);
-    
+
     // Charger les compteurs de messages non lus dès la connexion
     loadUnreadCounts();
   };
@@ -57,16 +60,16 @@ export async function connect() {
         console.log("Message mal formaté :", msg);
         return;
       }
-      
+
       const main = document.querySelector("main");
       const currentChatId = main.dataset.userId; // On stocke maintenant l'user_id et non la session_id
-      
+
       // Si le message vient de nous (confirmation d'envoi)
       if (msg.sender_id === userId) {
         displayMessage(msg, true);
         return;
       }
-      
+
       // Si le message est pour la conversation actuellement ouverte
       if (currentChatId === msg.sender_id) {
         displayMessage(msg, false);
@@ -90,9 +93,9 @@ async function loadUnreadCounts() {
     const response = await fetch(`/api/unread-counts?session_id=${sessionId}`);
     if (response.status === 200) {
       const unreadCounts = await response.json();
-      
+
       // Mettre à jour les notifications pour chaque expéditeur
-      unreadCounts.forEach(count => {
+      unreadCounts.forEach((count) => {
         notifications.set(count.sender_id, count.count);
         updateNotificationBadge(count.sender_id);
       });
@@ -105,20 +108,31 @@ async function loadUnreadCounts() {
 // Affiche un message dans la conversation
 function displayMessage(msg, isSelf) {
   const main = document.querySelector("main");
-  const chatMessages = main.querySelector(".chat-messages") || main;
-  
+  // Recherche d'abord la div de conversation
+  const conversationContainer = main.querySelector(".conversation-container");
+  const chatMessages = conversationContainer || main.querySelector(".chat-messages") || main;
+
+  // Créer un conteneur pour aligner le message correctement
+  const messageContainer = document.createElement("div");
+  messageContainer.className = isSelf
+    ? "message-container message-sent-container"
+    : "message-container message-received-container";
+
   // Créer l'élément de message avec une classe différente selon l'expéditeur
   let messageElement = document.createElement("div");
   messageElement.className = isSelf ? "message-sent" : "message-received";
-  
+
   // Ajouter le contenu du message
   messageElement.innerHTML = `
     <div class="message-content">${msg.content}</div>
-    <div class="message-time">${formatDate(msg.date)}</div>
-  ;`
-  
-  chatMessages.appendChild(messageElement);
-  
+    <div class="message-time">${formatDate(msg.date)}</div>`;
+
+  // Ajouter le message au conteneur
+  messageContainer.appendChild(messageElement);
+
+  // Ajouter le conteneur à la zone de chat
+  chatMessages.appendChild(messageContainer);
+
   // Faire défiler vers le bas pour voir le nouveau message
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
@@ -126,9 +140,9 @@ function displayMessage(msg, isSelf) {
 // Formate la date pour l'affichage
 function formatDate(dateString) {
   if (!dateString) return "";
-  
+
   const date = new Date(dateString);
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 // Affiche une notification pour un nouveau message
@@ -138,10 +152,10 @@ function showNotification(msg) {
     notifications.set(msg.sender_id, 0);
   }
   notifications.set(msg.sender_id, notifications.get(msg.sender_id) + 1);
-  
+
   // Mettre à jour le badge de notification sur l'utilisateur correspondant
   updateNotificationBadge(msg.sender_id);
-  
+
   // Jouer un son de notification (optionnel)
   playNotificationSound();
 }
@@ -149,28 +163,28 @@ function showNotification(msg) {
 // Met à jour le badge de notification sur l'utilisateur correspondant
 function updateNotificationBadge(senderUserId) {
   // Trouver l'élément utilisateur par son attribut data-user-id
-  const userItems = document.querySelectorAll('li[data-user-id]');
+  const userItems = document.querySelectorAll("li[data-user-id]");
   let userItem = null;
-  
+
   for (const item of userItems) {
     if (item.dataset.userId === senderUserId) {
       userItem = item;
       break;
     }
   }
-  
+
   if (!userItem) return;
-  
+
   // Rechercher un badge existant ou en créer un nouveau
   let badge = userItem.querySelector(".notification-badge");
   const count = notifications.get(senderUserId);
-  
+
   if (!badge && count > 0) {
     badge = document.createElement("span");
     badge.className = "notification-badge";
     userItem.querySelector(".a").appendChild(badge);
   }
-  
+
   if (badge) {
     badge.textContent = count;
     badge.style.display = count > 0 ? "block" : "none";
@@ -185,8 +199,8 @@ function clearNotifications(userId) {
 
 // Joue un son de notification
 function playNotificationSound() {
-  const audio = new Audio('/notification.mp3'); // Assurez-vous d'avoir ce fichier
-  audio.play().catch(e => console.log("Erreur de lecture audio:", e));
+  const audio = new Audio("/notification.mp3"); // Assurez-vous d'avoir ce fichier
+  audio.play().catch((e) => console.log("Erreur de lecture audio:", e));
 }
 
 export function sendMessage() {
@@ -211,27 +225,27 @@ export function sendMessage() {
   };
 
   ws.send(JSON.stringify(msg));
-  
+
   // Vider l'input
   messageInput.value = "";
   messageInput.focus();
-  
+
   // Note: Le message sera affiché quand il reviendra avec l'ID et la date
 }
 
 // Informe le serveur du changement de conversation active
 export function switchChat(receiverUserId) {
   if (!ws || ws.readyState !== WebSocket.OPEN) return;
-  
+
   // Envoyer un message spécial pour indiquer le changement de conversation
   let msg = {
     sender_id: userId,
     receiver_id: receiverUserId,
-    content: "__CHAT_CHANGE__"
+    content: "__CHAT_CHANGE__",
   };
-  
+
   ws.send(JSON.stringify(msg));
-  
+
   // Effacer les notifications pour cette conversation
   clearNotifications(receiverUserId);
 }
@@ -239,26 +253,28 @@ export function switchChat(receiverUserId) {
 // Charge l'historique des messages pour une conversation
 export async function loadChatHistory(receiverUserId) {
   try {
-    const response = await fetch(`/api/chat-history?session_id=${sessionId}&receiver_id=${receiverUserId}`);
+    const response = await fetch(
+      `/api/chat-history?session_id=${sessionId}&receiver_id=${receiverUserId}`
+    );
     if (response.status === 200) {
       const messages = await response.json();
-      
+
       // Effacer la conversation actuelle
       const main = document.querySelector("main");
-      const chatMessages = main.querySelector(".chat-messages");
-      
-      if (chatMessages) {
-        chatMessages.innerHTML = '';
+      const conversationContainer = main.querySelector(".conversation-container");
+
+      if (conversationContainer) {
+        conversationContainer.innerHTML = "";
       }
-      
+
       // Afficher tous les messages
-      messages.forEach(msg => {
+      messages.forEach((msg) => {
         displayMessage(msg, msg.sender_id === userId);
       });
-      
+
       // Faire défiler vers le bas
-      if (chatMessages) {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+      if (conversationContainer) {
+        conversationContainer.scrollTop = conversationContainer.scrollHeight;
       }
     }
   } catch (error) {
@@ -281,7 +297,7 @@ export async function getOnlineUsers() {
   const sessionCookie = document.cookie
     .split("; ")
     .find((cookie) => cookie.startsWith("session="));
-  
+
   if (!sessionCookie || !sessionCookie.split("=")[1]) {
     clearSession();
     return;
@@ -298,17 +314,17 @@ export async function getOnlineUsers() {
 
   // Nettoyer le menu actuel pour une reconstruction complète
   // (cela évite les problèmes avec les attributs data-user-id)
-  onlineMenu.innerHTML = '';
+  onlineMenu.innerHTML = "";
 
   // Ajouter tous les utilisateurs en ligne
   datas.forEach((data) => {
     // Ne pas afficher l'utilisateur actuel dans la liste
-    if (true) {
+    if (userId !== data.user_id) {
       // Création du nouvel élément <li>
       const listItem = document.createElement("li");
       listItem.id = data.session_id;
       listItem.dataset.userId = data.user_id; // Stocker l'ID utilisateur dans un attribut data
-      
+
       // Création de la div contenant le SVG + Nom de l'utilisateur
       listItem.innerHTML = `
         <div class="a connected-user">
@@ -324,45 +340,37 @@ export async function getOnlineUsers() {
 
       listItem.addEventListener("click", () => {
         const main = document.querySelector("main");
-        
+
         // Si c'est une nouvelle conversation, nettoyer l'ancienne
         if (main.dataset.userId !== data.user_id) {
           // Informer le serveur du changement de conversation
           switchChat(data.user_id);
-          
+
           // Définir l'ID utilisateur de la conversation actuelle
           main.dataset.userId = data.user_id;
-          
+
           // Mettre à jour l'interface
           main.innerHTML = `
-          <div id="new-post" class="new-post" style="display:none">+</div>
-          <button id="logout-btn" class="logout-btn">
-            <svg role="img" width="40px" viewBox="0 0 130 130" aria-label="icon">
-              <path
-                fill="none"
-                stroke="var(--neutral)"
-                stroke-width="3px"
-                d="M85 21.81a51.5 51.5 0 1 1-39.4-.34M64.5 10v51.66"
-                style="transition: stroke 0.2s ease-out, opacity 0.2s ease-out"
-              ></path>
-            </svg>
-          </button>
-          <div class="chat-header">${data.username}</div>
-          <div class="chat-messages"></div>
+
+          <div class="chat-header">
+            <div class="chat-header-avatar">${data.username.charAt(0)}</div>
+            <div class="chat-header-title">${data.username}</div>
+          </div>
+          <div class="conversation-container"></div>
           <div id="new-msg-container">
             <input id="message" type="text" placeholder="Message ..."></input>
-            <button id="send-msg">Send</button> 
-          </div>;`
+            <button id="send-msg"></button> 
+          </div>`;
 
           // Charger l'historique des messages
           loadChatHistory(data.user_id);
-          
+
           let sendBtn = document.getElementById("send-msg");
           let messageInput = document.getElementById("message");
-          
+
           sendBtn.addEventListener("click", () => {
             sendMessage();
-          });// Permettre l'envoi du message avec Entrée
+          }); // Permettre l'envoi du message avec Entrée
           messageInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter") {
               sendMessage();
@@ -375,113 +383,11 @@ export async function getOnlineUsers() {
       onlineMenu.appendChild(listItem);
     }
   });
-  
+
   // Mettre à jour les badges de notification
-  datas.forEach(data => {
+  datas.forEach((data) => {
     if (data.user_id !== userId) {
       updateNotificationBadge(data.user_id);
     }
   });
 }
-
-// Ajouter des styles CSS pour les notifications et messages
-export function addStyles() {
-  const style = document.createElement('style');
-  style.textContent = `
-    .message-sent, .message-received {
-      margin: 8px;
-      padding: 10px;
-      border-radius: 18px;
-      max-width: 70%;
-      word-wrap: break-word;
-    }
-    
-    .message-sent {
-      background-color: #dcf8c6;
-      align-self: flex-end;
-      margin-left: auto;
-    }
-    
-    .message-received {
-      background-color: #f1f0f0;
-      align-self: flex-start;
-      margin-right: auto;
-    }
-    
-    .chat-messages {
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      height: calc(100% - 130px);
-      padding: 10px;
-    }
-    
-    .chat-header {
-      background-color: #075e54;
-      color: white;
-      padding: 10px;
-      text-align: center;
-      font-weight: bold;
-    }
-    
-    .message-time {
-      font-size: 0.7em;
-      color: #999;
-      text-align: right;
-      margin-top: 2px;
-    }
-    
-    .notification-badge {
-      background-color: #FF4136;
-      color: white;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      position: absolute;
-      top: 0;
-      right: 0;
-      font-weight: bold;
-    }
-    
-    .connected-user {
-      position: relative;
-    }
-    
-    main {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    
-    #new-msg-container {
-      display: flex;
-      padding: 10px;
-      background-color: #f0f0f0;
-    }
-    
-    #message {
-      flex: 1;
-      padding: 10px;
-      border-radius: 20px;
-      border: 1px solid #ddd;
-      margin-right: 10px;
-    }
-    
-    #send-msg {
-      background-color: #075e54;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      padding: 0 15px;
-      cursor: pointer;
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-// Appeler cette fonction au chargement pour ajouter les styles
-document.addEventListener('DOMContentLoaded', addStyles);
