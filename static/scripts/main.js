@@ -39,7 +39,7 @@ window.addEventListener("DOMContentLoaded", async (event) => {
 
   // Connexion au websocket
   connect();
-  getOnlineUsers()
+  getOnlineUsers();
 
   // Charger les catégories
   categories = await LoadCategories();
@@ -50,9 +50,9 @@ window.addEventListener("DOMContentLoaded", async (event) => {
   DisplayPosts(posts, categories);
 
   setInterval(() => {
-    console.log("passage dans l'interval")
-    getOnlineUsers()
-  }, 3000)
+    console.log("passage dans l'interval");
+    getOnlineUsers();
+  }, 3000);
 });
 
 themeSwitch.addEventListener("click", () => {
@@ -67,6 +67,7 @@ const loginButton = document.getElementById("login-btn");
 const postButton = document.getElementById("new-post");
 const modal = document.getElementById("modal");
 const closeModal = document.getElementById("close-modal");
+const modalHeader = document.getElementById("modal-title");
 const modalBody = document.getElementById("modal-body");
 const modalFooter = document.getElementById("modal-footer");
 
@@ -185,6 +186,7 @@ logoutBtn.addEventListener("click", async function () {
 });
 
 export const loginForm = () => {
+  modalHeader.innerHTML = "";
   modalBody.innerHTML = loginContent;
   modalFooter.innerHTML = loginFooter;
   modal.style.display = "block";
@@ -199,6 +201,8 @@ postButton.addEventListener("click", async () => {
   if (
     !document.cookie.split("; ").some((cookie) => cookie.startsWith("session="))
   ) {
+    modalHeader.innerHTML = "";
+
     modalBody.innerHTML = loginContent;
     modalFooter.innerHTML = loginFooter;
     modal.style.display = "block";
@@ -212,6 +216,8 @@ postButton.addEventListener("click", async () => {
 
       if (response.status === 200) {
         // Si la session est valide, afficher le formulaire "New Post"
+        modalHeader.innerHTML = "";
+
         modalBody.innerHTML = postContent;
         modalFooter.innerHTML = "";
         modal.style.display = "block";
@@ -221,6 +227,7 @@ postButton.addEventListener("click", async () => {
     } catch (error) {
       document.cookie =
         "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      modalHeader.innerHTML = "";
 
       modalBody.innerHTML = loginContent;
       modalFooter.innerHTML = loginFooter;
@@ -244,9 +251,13 @@ window.addEventListener("click", (event) => {
 // Gérer le switch entre Login et Register
 document.addEventListener("click", (event) => {
   if (event.target && event.target.id === "switch-to-register") {
+    modalHeader.innerHTML = "";
+
     modalBody.innerHTML = registerContent;
     modalFooter.innerHTML = registerFooter;
   } else if (event.target && event.target.id === "switch-to-login") {
+    modalHeader.innerHTML = "";
+
     modalBody.innerHTML = loginContent;
     modalFooter.innerHTML = loginFooter;
   }

@@ -11,15 +11,40 @@ import (
 type Comment struct {
 	ID          int    `json:"id"`
 	Parent_post int    `json:"parent_post"`
-	Sender_id   int    `json:"sender_id"`
+	Sender_id   string    `json:"sender_id"`
 	Content     string `json:"content"`
 	Date        string `json:"date"`
 }
 
 func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		fmt.Println("No cookie")
+		return 
+	}
+	sessionID := cookie.Value
+
+	user_id, err := db.Query("SELECT user_id FROM sessions WHERE id =?", sessionID)
+	if err != nil {
+		fmt.Println("No usr id")
+    return 
+  }
+	defer user_id.Close()
+
+	var UserID string
+	for user_id.Next() {
+		var userID string
+    err = user_id.Scan(&userID)
+    if err != nil {
+      return 
+    }
+    UserID = userID
+		break
+	}
+
 	var comment Comment
 
-	err := json.NewDecoder(r.Body).Decode(&comment)
+	err = json.NewDecoder(r.Body).Decode(&comment)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -30,19 +55,51 @@ func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	_, err = db.Exec("INSERT INTO comments (parent_post,sender_id,content) VALUES (?,?,?)", comment.Parent_post, comment.Sender_id, comment.Content)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	comment.Sender_id = UserID
+
+	tx, err := db.Begin()
+if err != nil {
+	fmt.Println(err)
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+    return
+}
+
+_, err = tx.Exec("INSERT INTO comments (parent_post,sender_id,content) VALUES (?,?,?)", 
+    comment.Parent_post, comment.Sender_id, comment.Content)
+if err != nil {
+    tx.Rollback()
+		fmt.Println(err)
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+    return
+}
+
+err = tx.Commit()
+if err != nil {
+	fmt.Println(err)
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+    return
+}
 
 	fmt.Println("Comment added successfuly !")
 }
 
 func Get(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	rows, err := db.Query("SELECT id, parent_post, sender_id, date, content FROM comments")
-	if err != nil {
-		log.Fatal(err)
+	var rows *sql.Rows
+	var err error
+
+	id := r.URL.Query().Get("id")
+	if id != "" {
+		rows, err = db.Query("SELECT id, parent_post, sender_id, date, content FROM comments WHERE parent_post = ?", id)
+    if err != nil {
+      http.Error(w, err.Error(), http.StatusNotFound)
+      return
+    }
+
+	}else{
+		rows, err = db.Query("SELECT id, parent_post, sender_id, date, content FROM comments")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	defer rows.Close()
 

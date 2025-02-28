@@ -12,7 +12,6 @@ export async function LoadPosts() {
       throw new Error("Error in API request");
     }
     posts = await response.json();
-    console.log(posts);
     return posts;
   } catch (err) {
     console.error(err);
@@ -20,7 +19,7 @@ export async function LoadPosts() {
   }
 }
 
-export function DisplayPosts(posts, categories) {
+export function DisplayPosts(posts) {
   const main = document.querySelector("main");
   console.log(typeof posts);
 
@@ -64,6 +63,115 @@ export function DisplayPosts(posts, categories) {
     postElement.appendChild(head);
     postElement.appendChild(body);
 
+    //Create Modal
+    postElement.addEventListener("click", async () => {
+      let comments = await GetComments(post.id);
+      displayComment(post, comments);
+    });
+
     main.appendChild(postElement);
   });
+}
+
+function displayComment(post, comments) {
+  const modal = document.getElementById("modal");
+  const modalTitle = document.getElementById("modal-title");
+  const modalBody = document.getElementById("modal-body");
+  const modalFooter = document.getElementById("modal-footer");
+
+  modalTitle.innerHTML = "";
+  modalBody.innerHTML = "";
+  modalFooter.innerHTML = "";
+
+  const input = document.createElement("input");
+  input.classList.add("comment-input");
+  input.setAttribute("type", "text");
+  input.setAttribute("placeholder", "Write a comment...");
+  modalFooter.appendChild(input);
+
+  const submitBtn = document.createElement("button");
+  submitBtn.id = "comment-btn";
+  submitBtn.textContent = "Send";
+  modalFooter.appendChild(submitBtn);
+
+  const postContent = document.createElement("div");
+  postContent.classList.add("modal-area");
+  postContent.textContent = post.content;
+  modalTitle.appendChild(postContent);
+
+  submitBtn.addEventListener("click", () => {
+    console.log("trigger");
+    sendComment(post.id, post);
+  });
+
+  modal.style.display = "flex";
+
+  //Display comments
+  console.log("Length of comments", comments.length);
+  if (comments && comments.length > 0) {
+    const commentsContainer = document.createElement("div");
+    commentsContainer.classList.add("comments-container");
+    comments.forEach((comment) => {
+      const commentElement = document.createElement("div");
+      commentElement.classList.add("comment");
+      commentElement.textContent = comment.content;
+      commentsContainer.appendChild(commentElement);
+    });
+    modalBody.appendChild(commentsContainer);
+  }
+}
+
+async function GetComments(postID) {
+  console.log("Get comments start");
+  try {
+    const response = await fetch(`/api/comment?id=${postID}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Error in API request");
+    }
+    console.log(response);
+    return await response.json();
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+async function sendComment(postID, post) {
+  console.log("Send Comment start");
+  const input = document.querySelector(".comment-input");
+  const comment = input.value;
+  if (!comment) {
+    alert("Please enter a comment");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/comment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        parent_post: postID,
+        content: comment,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error("Error in API request");
+    }
+    input.value = "";
+    console.log(response);
+
+    const comments = await GetComments(postID);
+    displayComment(post, comments);
+  } catch (err) {
+    console.error(err);
+    alert("Error sending comment");
+    return;
+  }
 }

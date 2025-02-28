@@ -279,6 +279,11 @@ main {
   padding: min(1em, 5%);
   max-width: 700px;
   width: 80%;
+  cursor: pointer;
+
+  box-shadow: inset 1px 1px 5px 0px rgba(182, 182, 182, 0.4),
+    inset -2px -2px 5px 0px rgba(0, 0, 0, 0.5),
+    0px 0px 10px 0px rgba(0, 0, 0, 0.3);
 
   div {
     display: flex;
@@ -481,6 +486,8 @@ span {
 }
 
 .modal-area {
+  text-align: justify;
+  text-wrap: 1;
   border-radius: 10px;
   border: 1px solid var(--greyFill);
   width: 90%;
@@ -621,4 +628,72 @@ span {
 
 .logout-btn:hover {
   background-color: var(--red35);
+}
+
+div.modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+#modal-title {
+  margin-bottom: 10px;
+}
+
+#modal-body {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  background: var(--bgLevel4);
+  border-radius: 10px;
+  color: var(--textMinimal);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--textMinimal);
+  border-radius: 10px;
+}
+
+.comments-container {
+  margin-top: 10px;
+}
+
+.comment {
+  background-color: var(--bgLevel3);
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+#modal-footer {
+  padding: 10px 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  input {
+    flex-grow: 1;
+    padding: 4px;
+    background: var(--bgLevel4);
+    color: var(--textNeutral);
+    outline: none;
+    border: none;
+    border-radius: 5px;
+  }
+
+  button {
+    border-radius: 5px;
+
+    padding: 4px;
+    background: var(--bgLevel4);
+    color: var(--textNeutral);
+    font-weight: 600;
+  }
 }
