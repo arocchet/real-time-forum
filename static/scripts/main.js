@@ -39,7 +39,7 @@ window.addEventListener("DOMContentLoaded", async (event) => {
 
   // Connexion au websocket
   connect();
-  getOnlineUsers()
+  getOnlineUsers();
 
   // Charger les catégories
   categories = await LoadCategories();
@@ -50,9 +50,9 @@ window.addEventListener("DOMContentLoaded", async (event) => {
   DisplayPosts(posts, categories);
 
   setInterval(() => {
-    console.log("passage dans l'interval")
-    getOnlineUsers()
-  }, 3000)
+    console.log("passage dans l'interval");
+    getOnlineUsers();
+  }, 3000);
 });
 
 themeSwitch.addEventListener("click", () => {

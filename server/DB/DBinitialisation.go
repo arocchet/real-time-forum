@@ -3,28 +3,45 @@ package db
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func Init() (*sql.DB, error) {
-
 	db, err := sql.Open("sqlite3", "./database.db")
 	if err != nil {
-		log.Fatal(err)
-		return nil, err
+			log.Fatal(err)
+			return nil, err
 	}
-
+	
+	// Configurer le pool de connexions
+	db.SetMaxOpenConns(10)           // Maximum de connexions ouvertes simultanément
+	db.SetMaxIdleConns(5)            // Maximum de connexions inactives conservées
+	db.SetConnMaxLifetime(time.Hour) // Durée de vie maximale d'une connexion
+	
+	// Créer les tables si elles n'existent pas
 	CreateUser(db)
 	CreateCategories(db)
 	CreatePrivateMsg(db)
 	CreateComments(db)
 	CreatePosts(db)
 	CreateSessions(db)
-
+	
+	// Activer le mode WAL pour permettre plus de concurrence
+	_, err = db.Exec("PRAGMA journal_mode=WAL;")
+	if err != nil {
+			log.Println("Erreur en configurant WAL mode:", err)
+	}
+	
+	// Définir un timeout pour les transactions bloquées
+	_, err = db.Exec("PRAGMA busy_timeout = 5000;") // 5 secondes
+	if err != nil {
+			log.Println("Erreur en configurant busy_timeout:", err)
+	}
+	
 	return db, nil
 }
-
 func CreateUser(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS users(
