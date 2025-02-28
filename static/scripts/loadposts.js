@@ -67,8 +67,6 @@ export function DisplayPosts(posts) {
     postElement.addEventListener("click", async () => {
       let comments = await GetComments(post.id);
       displayComment(post, comments);
-      // const submitBtn = document.getElementById("comment-btn");
-      // submitBtn.addEventListener("click", sendComment(post.id));
     });
 
     main.appendChild(postElement);
@@ -77,9 +75,12 @@ export function DisplayPosts(posts) {
 
 function displayComment(post, comments) {
   const modal = document.getElementById("modal");
+  const modalTitle = document.getElementById("modal-title");
   const modalBody = document.getElementById("modal-body");
   const modalFooter = document.getElementById("modal-footer");
 
+  modalTitle.innerHTML = "";
+  modalBody.innerHTML = "";
   modalFooter.innerHTML = "";
 
   const input = document.createElement("input");
@@ -93,18 +94,20 @@ function displayComment(post, comments) {
   submitBtn.textContent = "Send";
   modalFooter.appendChild(submitBtn);
 
+  const postContent = document.createElement("div");
+  postContent.classList.add("modal-area");
+  postContent.textContent = post.content;
+  modalTitle.appendChild(postContent);
+
   submitBtn.addEventListener("click", () => {
     console.log("trigger");
     sendComment(post.id, post);
   });
 
   modal.style.display = "flex";
-  modalBody.innerHTML = `<p class="modal-area"> ${JSON.stringify(
-    post
-  )} \nComments : ${comments}
-   </p>`;
 
   //Display comments
+  console.log("Length of comments", comments.length);
   if (comments && comments.length > 0) {
     const commentsContainer = document.createElement("div");
     commentsContainer.classList.add("comments-container");

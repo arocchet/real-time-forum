@@ -89,7 +89,7 @@ func Get(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	id := r.URL.Query().Get("id")
 	if id != "" {
-		rows, err = db.Query("SELECT id, parent_post, sender_id, date, content FROM comments WHERE id =?", id)
+		rows, err = db.Query("SELECT id, parent_post, sender_id, date, content FROM comments WHERE parent_post = ?", id)
     if err != nil {
       http.Error(w, err.Error(), http.StatusNotFound)
       return
