@@ -309,6 +309,9 @@ export async function getOnlineUsers() {
 
   let datas = await response.json();
 
+  // Sort users alphabetically by username
+  datas.sort((a, b) => a.username.localeCompare(b.username));
+
   // Sélection de la div contenant les utilisateurs en ligne
   const onlineMenu = document.getElementById("sub-online-menu");
 

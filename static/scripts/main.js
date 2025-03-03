@@ -75,8 +75,8 @@ const modalFooter = document.getElementById("modal-footer");
 const loginContent = `
   <h2>Login</h2>
   <form id="login-form">
-    <label for="email">Email:</label>
-    <input class="modal-input" type="email" id="email" name="email" required><br><br>
+    <label for="email">Email or Username:</label>
+    <input class="modal-input" type="text" id="email" name="email" required><br><br>
     <label for="password">Password:</label>
     <input class="modal-input" type="password" id="password" name="password" required><br><br>
     <button class="modal-btn" type="submit">Login</button>

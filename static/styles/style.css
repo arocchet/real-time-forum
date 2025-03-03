@@ -838,17 +838,6 @@ div.modal-content {
   position: relative;
 }
 
-main {
-  display: flex;
-  flex-direction: column;
-  height: 100dvh;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  overflow-y: hidden;
-  padding: 1em;
-  gap: 1em;
-  align-items: center;
-}
-
 #new-msg-container {
   margin-bottom: 4.8vmax;
   display: flex;
@@ -918,4 +907,12 @@ main {
 }
 .conversation-container::-webkit-scrollbar{
  display: none;
+}
+
+main {
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  align-items: center;
 }

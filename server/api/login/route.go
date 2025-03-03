@@ -30,9 +30,9 @@ func Post(w http.ResponseWriter, r *http.Request, db *sql.DB, port string) {
 	// Récupérer l'ID et le mot de passe hashé depuis la base de données
 	var userID string
 	var hashedPassword string
-	err = db.QueryRow("SELECT id, password FROM users WHERE email = ?", loginData.Email).Scan(&userID, &hashedPassword)
+	err = db.QueryRow("SELECT id, password FROM users WHERE email = ? OR username = ?", loginData.Email, loginData.Email).Scan(&userID, &hashedPassword)
 	if err == sql.ErrNoRows {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+		http.Error(w, "Invalid email/username or password", http.StatusUnauthorized)
 		return
 	} else if err != nil {
 		http.Error(w, "Database error", http.StatusInternalServerError)
