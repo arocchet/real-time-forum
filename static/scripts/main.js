@@ -1,6 +1,6 @@
 import { LoadCategories } from "./loadcategories.js";
 import { DisplayPosts, LoadPosts } from "./loadposts.js";
-import { connect, disconnect, getOnlineUsers } from "./websocket.js";
+import { connect, disconnect, getOnlineUsers, sendMessage } from "./websocket.js";
 
 // Theme Switch
 const logoutBtn = document.getElementById("logout-btn");

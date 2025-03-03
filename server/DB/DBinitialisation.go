@@ -70,6 +70,7 @@ func CreatePrivateMsg(db *sql.DB) {
         receiver_id INTEGER NOT NULL,
         content TEXT NOT NULL,
         date DATETIME DEFAULT CURRENT_TIMESTAMP,
+		read_status INTEGER,
         FOREIGN KEY (sender_id) REFERENCES users(id),
         FOREIGN KEY (receiver_id) REFERENCES users(id)
     );`

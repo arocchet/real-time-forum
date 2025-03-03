@@ -148,7 +148,15 @@ func main() {
 		}
 	})
 
-	mux.HandleFunc("/ws", websocket.HandleConnections)
+	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		websocket.HandleConnections(w, r, db)
+	})
+	mux.HandleFunc("/api/chat-history", func(w http.ResponseWriter, r *http.Request) {
+		websocket.GetChatHistory(w, r, db)
+	})
+	mux.HandleFunc("/api/unread-counts", func(w http.ResponseWriter, r *http.Request) {
+		websocket.GetUnreadMessageCount(w, r, db)
+	})
 	mux.HandleFunc("/api/online-users", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
