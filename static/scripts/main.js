@@ -7,6 +7,7 @@ const logoutBtn = document.getElementById("logout-btn");
 const themeSwitch = document.getElementById("switch-theme");
 const sunIcon = document.getElementById("sun-icon");
 const moonIcon = document.getElementById("moon-icon");
+const main = document.querySelector("main");
 
 function setThemeIcons() {
   if (document.body.classList.contains("dark-theme")) {
@@ -34,6 +35,24 @@ function checkSessionCookie() {
 //variable
 let categories = {};
 
+function throttle(mainFunction, delay) {
+  let timerFlag = null;
+  return (...args) => {
+    if (timerFlag === null) {
+      mainFunction(...args);
+      timerFlag = setTimeout(() => {
+        timerFlag = null;
+      }, delay);
+    }
+  };
+}
+
+let throttleScroll = throttle(async () => {
+  console.log("throttleScroll");
+  let p = await LoadPosts();
+  DisplayPosts(p, categories);
+}, 3000);
+
 window.addEventListener("DOMContentLoaded", async (event) => {
   setThemeIcons();
 
@@ -53,6 +72,10 @@ window.addEventListener("DOMContentLoaded", async (event) => {
     console.log("passage dans l'interval");
     getOnlineUsers();
   }, 3000);
+
+  setTimeout(() => {
+    document.addEventListener("scroll", throttleScroll);
+  }, 1000);
 });
 
 themeSwitch.addEventListener("click", () => {

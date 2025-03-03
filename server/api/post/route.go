@@ -7,6 +7,7 @@ import (
 	"log"
 	"main/server/api/categories"
 	"net/http"
+	"strconv"
 )
 
 type Poste struct {
@@ -51,6 +52,9 @@ func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
 func Get(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+
+	last,err := strconv.Atoi(r.URL.Query().Get("last"))
+
 	rows, err := db.Query("SELECT id, post_user_id, post_user_name, category_name, title, content, date FROM posts")
 	if err != nil {
 		log.Println(err)
@@ -68,6 +72,11 @@ func Get(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 		posts = append(posts, post)
 	}
+
+	if last + 10 < len(posts){
+		posts = posts[:last+10]
+	}
+
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(posts)

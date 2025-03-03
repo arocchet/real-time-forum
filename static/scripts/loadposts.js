@@ -1,8 +1,13 @@
 export async function LoadPosts() {
   let posts = [];
+  let lastPost = null;
+  const main = document.querySelector("main");
+  if (main.lastChild.dataset) {
+    lastPost = main.lastChild.dataset.id;
+  }
   // Load posts from API endpoint
   try {
-    const response = await fetch("/api/post", {
+    const response = await fetch(`/api/post?last=${lastPost}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -12,6 +17,8 @@ export async function LoadPosts() {
       throw new Error("Error in API request");
     }
     posts = await response.json();
+
+    console.log(posts.length);
     return posts;
   } catch (err) {
     console.error(err);
@@ -21,7 +28,9 @@ export async function LoadPosts() {
 
 export function DisplayPosts(posts) {
   const main = document.querySelector("main");
-  console.log(typeof posts);
+  const postsList = main.querySelectorAll(".post");
+  postsList.forEach((post) => main.removeChild(post));
+  console.log(posts);
 
   if (!posts) {
     alert("No posts found");
@@ -31,6 +40,7 @@ export function DisplayPosts(posts) {
   Array.from(posts).forEach((post) => {
     const postElement = document.createElement("div");
     postElement.classList.add("post");
+    postElement.dataset.id = post.id;
 
     const title = document.createElement("h2");
     title.classList.add("title");
