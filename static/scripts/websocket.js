@@ -319,7 +319,7 @@ export async function getOnlineUsers() {
   // Ajouter tous les utilisateurs en ligne
   datas.forEach((data) => {
     // Ne pas afficher l'utilisateur actuel dans la liste
-    if (userId !== data.user_id) {
+    if (true/*userId !== data.user_id*/) {
       // Création du nouvel élément <li>
       const listItem = document.createElement("li");
       listItem.id = data.session_id;

@@ -754,7 +754,10 @@ span {
   top: 0;
   right: 0;
   font-weight: bold;
+  text-align: center;
 }
+
+
 
 .connected-user {
   position: relative;
@@ -772,13 +775,12 @@ main {
 }
 
 #new-msg-container {
+  margin-bottom: 4.8vmax;
   display: flex;
   padding: 10px;
   align-items: center;
-  border: 1px solid #ddd;
   border-radius: 10px;
   width: 100%;
-
 }
 
 #message {
