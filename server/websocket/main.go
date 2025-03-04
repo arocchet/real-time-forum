@@ -190,6 +190,22 @@ func (c *Client) readPump() {
 			continue
 		}
 
+		// Ne pas enregistrer les messages de type "__TYPING__" en DB
+		if msg.Content == "__TYPING__" {
+			// Envoyer le message au destinataire sans l'enregistrer
+			sessionID, isOnline := GetSessionByUserID(msg.ReceiverID)
+			if isOnline {
+				clientsMutex.Lock()
+				receiver, exists := clients[sessionID]
+				clientsMutex.Unlock()
+
+				if exists {
+					receiver.Send <- msg
+				}
+			}
+			continue
+		}
+
 		// Remplacer les ID de session par les ID utilisateur
 		msg.SenderID = c.UserID
 
@@ -274,10 +290,20 @@ func (c *Client) writePump() {
 func GetChatHistory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	senderSessionID := r.URL.Query().Get("session_id")
 	receiverUserID := r.URL.Query().Get("receiver_id")
+	offset := r.URL.Query().Get("offset")
+	limit := r.URL.Query().Get("limit")
 
 	if senderSessionID == "" || receiverUserID == "" {
 		http.Error(w, "ID session et ID utilisateur destinataire requis", http.StatusBadRequest)
 		return
+	}
+
+	if offset == "" {
+		offset = "0"
+	}
+
+	if limit == "" {
+		limit = "10"
 	}
 
 	// Récupérer l'ID utilisateur de l'expéditeur
@@ -294,8 +320,9 @@ func GetChatHistory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		SELECT id, sender_id, receiver_id, content, date 
 		FROM private_msg 
 		WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
-		ORDER BY date ASC
-	`, senderUserID, receiverUserID, receiverUserID, senderUserID)
+		ORDER BY date DESC
+		LIMIT ? OFFSET ?
+	`, senderUserID, receiverUserID, receiverUserID, senderUserID, limit, offset)
 
 	if err != nil {
 		http.Error(w, "Erreur de requête", http.StatusInternalServerError)

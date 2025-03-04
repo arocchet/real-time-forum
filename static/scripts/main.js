@@ -48,9 +48,10 @@ function throttle(mainFunction, delay) {
 }
 
 let throttleScroll = throttle(async () => {
-  console.log("throttleScroll");
-  let p = await LoadPosts();
-  DisplayPosts(p, categories);
+  if (!main.dataset.userId) {
+    let p = await LoadPosts();
+    DisplayPosts(p, categories);
+  }
 }, 3000);
 
 window.addEventListener("DOMContentLoaded", async (event) => {

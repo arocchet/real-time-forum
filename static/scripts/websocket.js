@@ -4,6 +4,8 @@ let ws;
 let sessionId;
 let userId;
 let notifications = new Map(); // Pour stocker les notifications par utilisateur
+let typingTimeout;
+const TYPING_INDICATOR_TIMEOUT = 3000; // 3 seconds
 
 export async function connect() {
   const sessionCookie = document.cookie
@@ -55,27 +57,26 @@ export async function connect() {
   ws.onmessage = (event) => {
     try {
       let msg = JSON.parse(event.data);
+      const main = document.querySelector("main");
+      const currentChatId = main.dataset.userId;
+
+      if (msg.content === "__TYPING__" && msg.sender_id !== userId) {
+        showTypingIndicator(msg.sender_id);
+        return;
+      }
 
       if (!msg.sender_id || !msg.content) {
         console.log("Message mal formaté :", msg);
         return;
-      }
-
-      const main = document.querySelector("main");
-      const currentChatId = main.dataset.userId; // On stocke maintenant l'user_id et non la session_id
-
-      // Si le message vient de nous (confirmation d'envoi)
-      if (msg.sender_id === userId) {
+      } else if (msg.content !== "__TYPING__"  && msg.sender_id === userId) {
         displayMessage(msg, true);
         return;
-      }
-
-      // Si le message est pour la conversation actuellement ouverte
-      if (currentChatId === msg.sender_id) {
+      } else if (msg.content !== "__TYPING__" && currentChatId === msg.sender_id) {
         displayMessage(msg, false);
       } else {
-        // Si le message est pour une autre conversation, afficher une notification
-        showNotification(msg);
+        if (msg.content !== "__TYPING__") {
+          showNotification(msg);
+        }
       }
     } catch (error) {
       console.error("Erreur de parsing JSON:", error);
@@ -110,7 +111,8 @@ function displayMessage(msg, isSelf) {
   const main = document.querySelector("main");
   // Recherche d'abord la div de conversation
   const conversationContainer = main.querySelector(".conversation-container");
-  const chatMessages = conversationContainer || main.querySelector(".chat-messages") || main;
+  const chatMessages =
+    conversationContainer || main.querySelector(".chat-messages") || main;
 
   // Créer un conteneur pour aligner le message correctement
   const messageContainer = document.createElement("div");
@@ -203,6 +205,29 @@ function playNotificationSound() {
   audio.play().catch((e) => console.log("Erreur de lecture audio:", e));
 }
 
+function showTypingIndicator(senderId) {
+  const main = document.querySelector("main");
+  const currentChatId = main.dataset.userId;
+
+  if (currentChatId === senderId) {
+    const typingIndicator = document.getElementById("typing-indicator");
+    if (!typingIndicator) {
+      const indicator = document.createElement("div");
+      indicator.id = "typing-indicator";
+      indicator.textContent = "L'autre personne est en train d'écrire...";
+      main.appendChild(indicator);
+    }
+
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      const indicator = document.getElementById("typing-indicator");
+      if (indicator) {
+        indicator.remove();
+      }
+    }, TYPING_INDICATOR_TIMEOUT);
+  }
+}
+
 export function sendMessage() {
   const main = document.querySelector("main");
   let receiverUserId = main.dataset.userId;
@@ -251,35 +276,54 @@ export function switchChat(receiverUserId) {
 }
 
 // Charge l'historique des messages pour une conversation
-export async function loadChatHistory(receiverUserId) {
+export async function loadChatHistory(receiverUserId, offset = 0, limit = 10) {
   try {
     const response = await fetch(
-      `/api/chat-history?session_id=${sessionId}&receiver_id=${receiverUserId}`
+      `/api/chat-history?session_id=${sessionId}&receiver_id=${receiverUserId}&offset=${offset}&limit=${limit}`
     );
     if (response.status === 200) {
       const messages = await response.json();
 
-      // Effacer la conversation actuelle
       const main = document.querySelector("main");
       const conversationContainer = main.querySelector(".conversation-container");
 
-      if (conversationContainer) {
-        conversationContainer.innerHTML = "";
-      }
+      const initialScrollHeight = conversationContainer.scrollHeight;
 
-      // Afficher tous les messages
-      messages.forEach((msg) => {
-        displayMessage(msg, msg.sender_id === userId);
+      messages.reverse().forEach((msg) => {
+        const messageElement = createMessageElement(msg, msg.sender_id === userId);
+        if (offset === 0) {
+          conversationContainer.appendChild(messageElement);
+        } else {
+          conversationContainer.insertBefore(messageElement, conversationContainer.firstChild);
+        }
       });
 
-      // Faire défiler vers le bas
-      if (conversationContainer) {
+      if (offset === 0) {
         conversationContainer.scrollTop = conversationContainer.scrollHeight;
+      } else {
+        conversationContainer.scrollTop = conversationContainer.scrollHeight - initialScrollHeight;
       }
     }
   } catch (error) {
     console.error("Erreur de chargement de l'historique:", error);
   }
+}
+
+function createMessageElement(msg, isSelf) {
+  const messageContainer = document.createElement("div");
+  messageContainer.className = isSelf
+    ? "message-container message-sent-container"
+    : "message-container message-received-container";
+
+  let messageElement = document.createElement("div");
+  messageElement.className = isSelf ? "message-sent" : "message-received";
+
+  messageElement.innerHTML = `
+    <div class="message-content">${msg.content}</div>
+    <div class="message-time">${formatDate(msg.date)}</div>`;
+
+  messageContainer.appendChild(messageElement);
+  return messageContainer;
 }
 
 export function disconnect() {
@@ -291,6 +335,37 @@ export function disconnect() {
 
 function clearSession() {
   document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+function notifyTyping() {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+  let msg = {
+    sender_id: userId,
+    receiver_id: document.querySelector("main").dataset.userId,
+    content: "__TYPING__",
+  };
+
+  ws.send(JSON.stringify(msg));
+}
+
+function setupTypingNotification() {
+  const messageInput = document.getElementById("message");
+  messageInput.addEventListener("input", () => {
+    notifyTyping();
+  });
+}
+
+function setupScrollListener() {
+  const conversationContainer = document.querySelector(".conversation-container");
+  conversationContainer.addEventListener("scroll", async () => {
+    if (conversationContainer.scrollTop === 0) {
+      const main = document.querySelector("main");
+      const receiverUserId = main.dataset.userId;
+      const currentMessagesCount = conversationContainer.children.length;
+      await loadChatHistory(receiverUserId, currentMessagesCount);
+    }
+  });
 }
 
 export async function getOnlineUsers() {
@@ -322,7 +397,7 @@ export async function getOnlineUsers() {
   // Ajouter tous les utilisateurs en ligne
   datas.forEach((data) => {
     // Ne pas afficher l'utilisateur actuel dans la liste
-    if (true/*userId !== data.user_id*/) {
+    if (true /*userId !== data.user_id*/) {
       // Création du nouvel élément <li>
       const listItem = document.createElement("li");
       listItem.id = data.session_id;
@@ -367,6 +442,12 @@ export async function getOnlineUsers() {
 
           // Charger l'historique des messages
           loadChatHistory(data.user_id);
+
+          // Setup typing notification
+          setupTypingNotification();
+
+          // Setup scroll listener
+          setupScrollListener();
 
           let sendBtn = document.getElementById("send-msg");
           let messageInput = document.getElementById("message");
