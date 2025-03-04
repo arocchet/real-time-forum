@@ -411,6 +411,54 @@ func GetUnreadMessageCount(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	json.NewEncoder(w).Encode(unreadCounts)
 }
 
+// GetRecentMessages récupère les messages récents pour un utilisateur
+func GetRecentMessages(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	sessionID := r.URL.Query().Get("session_id")
+
+	if sessionID == "" {
+		http.Error(w, "ID session requis", http.StatusBadRequest)
+		return
+	}
+
+	// Récupérer l'ID utilisateur
+	var userID string
+	err := db.QueryRow("SELECT user_id FROM sessions WHERE id = ?", sessionID).Scan(&userID)
+	if err != nil {
+		http.Error(w, "Session invalide", http.StatusUnauthorized)
+		log.Println("Erreur de récupération de l'ID utilisateur:", err)
+		return
+	}
+
+	// Récupérer les messages récents envoyés par l'utilisateur
+	rows, err := db.Query(`
+		SELECT id, sender_id, receiver_id, content, date 
+		FROM private_msg 
+		WHERE sender_id = ? 
+		ORDER BY date DESC
+		LIMIT 10
+	`, userID)
+
+	if err != nil {
+		http.Error(w, "Erreur de requête", http.StatusInternalServerError)
+		log.Println("Erreur de requête:", err)
+		return
+	}
+	defer rows.Close()
+
+	messages := []Message{}
+	for rows.Next() {
+		var msg Message
+		if err := rows.Scan(&msg.ID, &msg.SenderID, &msg.ReceiverID, &msg.Content, &msg.Date); err != nil {
+			log.Println("Erreur de scan:", err)
+			continue
+		}
+		messages = append(messages, msg)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(messages)
+}
+
 // disconnect supprime un client proprement
 func (c *Client) disconnect() {
 	c.once.Do(func() {

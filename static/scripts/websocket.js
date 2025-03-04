@@ -387,6 +387,28 @@ export async function getOnlineUsers() {
   // Sort users alphabetically by username
   datas.sort((a, b) => a.username.localeCompare(b.username));
 
+  // Fetch recent messages to prioritize users
+  const recentMessagesResponse = await fetch(`/api/recent-messages?session_id=${sessionId}`);
+  const recentMessages = await recentMessagesResponse.json();
+
+  console.log("message: ",recentMessages)
+
+  // Create a map to store the last message time for each user
+  const lastMessageTimeMap = new Map();
+  recentMessages.forEach((msg) => {
+    lastMessageTimeMap.set(msg.receiver_id, new Date(msg.date).getTime());
+  });
+
+  // Sort users by last message time, then alphabetically
+  datas.sort((a, b) => {
+    const timeA = lastMessageTimeMap.get(a.user_id) || 0;
+    const timeB = lastMessageTimeMap.get(b.user_id) || 0;
+    if (timeA !== timeB) {
+      return timeB - timeA;
+    }
+    return a.username.localeCompare(b.username);
+  });
+
   // Sélection de la div contenant les utilisateurs en ligne
   const onlineMenu = document.getElementById("sub-online-menu");
 

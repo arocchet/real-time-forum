@@ -157,6 +157,10 @@ func main() {
 	mux.HandleFunc("/api/unread-counts", func(w http.ResponseWriter, r *http.Request) {
 		websocket.GetUnreadMessageCount(w, r, db)
 	})
+
+	mux.HandleFunc("/api/recent-messages", func(w http.ResponseWriter, r *http.Request) {
+		websocket.GetRecentMessages(w, r, db)
+	})
 	mux.HandleFunc("/api/online-users", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
