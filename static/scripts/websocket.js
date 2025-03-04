@@ -331,6 +331,7 @@ export function disconnect() {
     ws.close();
     console.log("WebSocket fermé");
   }
+  window.location.reload();
 }
 
 function clearSession() {
@@ -451,7 +452,25 @@ export async function getOnlineUsers() {
 
           // Mettre à jour l'interface
           main.innerHTML = `
-
+                <div id="modal" class="modal" style="display: none">
+        <div class="modal-content">
+          <span id="close-modal" class="close-btn">&times;</span>
+          <div id="modal-title"></div>
+          <div id="modal-body"></div>
+          <div id="modal-footer"></div>
+        </div>
+      </div>
+              <button id="logout-btn" class="logout-btn">
+      <svg role="img" width="40px" viewBox="0 0 130 130" aria-label="icon">
+        <path
+          fill="none"
+          stroke="var(--neutral)"
+          stroke-width="3px"
+          d="M85 21.81a51.5 51.5 0 1 1-39.4-.34M64.5 10v51.66"
+          style="transition: stroke 0.2s ease-out, opacity 0.2s ease-out"
+        ></path>
+      </svg>
+    </button>
           <div class="chat-header">
             <div class="chat-header-avatar">${data.username.charAt(0)}</div>
             <div class="chat-header-title">${data.username}</div>
@@ -489,6 +508,28 @@ export async function getOnlineUsers() {
       onlineMenu.appendChild(listItem);
     }
   });
+  const logoutBtn = document.getElementById("logout-btn");
+  logoutBtn.addEventListener("click", async function () {
+    try {
+      const response = await fetch("http://localhost:8080/api/sessions", {
+        method: "DELETE",
+      });
+  
+      if (!response.ok) {
+        throw new Error("Error in API request");
+      }
+  
+      disconnect();
+      document.cookie =
+        "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      modal.style.display = "none";
+      logoutBtn.style.display = "none";
+    } catch (error) {
+      console.error("Error:", error);
+      alert("There was an error with the request.");
+    }
+  });
+  
 
   // Mettre à jour les badges de notification
   datas.forEach((data) => {
