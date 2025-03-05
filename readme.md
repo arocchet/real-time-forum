@@ -179,9 +179,3 @@ Le déploiement se fera via [Méthode de déploiement à spécifier].
 ## 14. Informations de contact et contributions
 
 ClemNTTS & Arocchet
-
-
-<br>
-<br>
-
-**Note importante:**  Cette documentation est un exemple et devra être complétée avec des détails spécifiques au projet.  N'oubliez pas d'ajouter des exemples de code plus complets et des captures d'écran pertinentes.  Le formatage Markdown a été utilisé pour faciliter la lecture et la maintenance.  Des améliorations visuelles peuvent être ajoutées à l'aide d'outils comme Mermaid.js pour les diagrammes plus complexes.
