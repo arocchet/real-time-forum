@@ -96,7 +96,7 @@ const modalBody = document.getElementById("modal-body");
 const modalFooter = document.getElementById("modal-footer");
 
 // Contenus pour chaque modal
-const loginContent = `
+export const loginContent = `
   <h2>Login</h2>
   <form id="login-form">
     <label for="email">Email or Username:</label>
@@ -107,7 +107,7 @@ const loginContent = `
   </form>
 `;
 
-const registerContent = `
+export const registerContent = `
   <h2>Register</h2>
   <form id="register-form">
     <label for="reg-username">Username:</label>
@@ -154,11 +154,11 @@ const postContent = `
 `;
 
 // Contenus du footer pour basculer entre Login et Register
-const loginFooter = `
+export const loginFooter = `
   <p>Don't have an account? <a class="modal-href" href="#" id="switch-to-register">Register</a></p>
 `;
 
-const registerFooter = `
+export const registerFooter = `
   <p>Already have an account? <a class="modal-href" href="#" id="switch-to-login">Login</a></p>
 `;
 

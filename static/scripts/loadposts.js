@@ -1,3 +1,5 @@
+import { loginContent, loginFooter } from "./main.js";
+
 export async function LoadPosts() {
   let posts = [];
   let lastPost = null;
@@ -85,49 +87,64 @@ export function DisplayPosts(posts) {
 
 function displayComment(post, comments) {
   const modal = document.getElementById("modal");
-  const modalTitle = document.getElementById("modal-title");
+  const modalHeader = document.getElementById("modal-title");
   const modalBody = document.getElementById("modal-body");
   const modalFooter = document.getElementById("modal-footer");
+  if (
+    !document.cookie.split("; ").some((cookie) => cookie.startsWith("session="))
+  ) {
+    modalHeader.innerHTML = "";
 
-  modalTitle.innerHTML = "";
-  modalBody.innerHTML = "";
-  modalFooter.innerHTML = "";
+    modalBody.innerHTML = loginContent;
+    modalFooter.innerHTML = loginFooter;
+    modal.style.display = "block";
+    console.log("here");
+  } else {
+    const modal = document.getElementById("modal");
+    const modalTitle = document.getElementById("modal-title");
+    const modalBody = document.getElementById("modal-body");
+    const modalFooter = document.getElementById("modal-footer");
 
-  const input = document.createElement("input");
-  input.classList.add("comment-input");
-  input.setAttribute("type", "text");
-  input.setAttribute("placeholder", "Write a comment...");
-  modalFooter.appendChild(input);
+    modalTitle.innerHTML = "";
+    modalBody.innerHTML = "";
+    modalFooter.innerHTML = "";
 
-  const submitBtn = document.createElement("button");
-  submitBtn.id = "comment-btn";
-  submitBtn.textContent = "Send";
-  modalFooter.appendChild(submitBtn);
+    const input = document.createElement("input");
+    input.classList.add("comment-input");
+    input.setAttribute("type", "text");
+    input.setAttribute("placeholder", "Write a comment...");
+    modalFooter.appendChild(input);
 
-  const postContent = document.createElement("div");
-  postContent.classList.add("modal-area");
-  postContent.textContent = post.content;
-  modalTitle.appendChild(postContent);
+    const submitBtn = document.createElement("button");
+    submitBtn.id = "comment-btn";
+    submitBtn.textContent = "Send";
+    modalFooter.appendChild(submitBtn);
 
-  submitBtn.addEventListener("click", () => {
-    console.log("trigger");
-    sendComment(post.id, post);
-  });
+    const postContent = document.createElement("div");
+    postContent.classList.add("modal-area");
+    postContent.textContent = post.content;
+    modalTitle.appendChild(postContent);
 
-  modal.style.display = "flex";
-
-  //Display comments
-  console.log("Length of comments", comments.length);
-  if (comments && comments.length > 0) {
-    const commentsContainer = document.createElement("div");
-    commentsContainer.classList.add("comments-container");
-    comments.forEach((comment) => {
-      const commentElement = document.createElement("div");
-      commentElement.classList.add("comment");
-      commentElement.textContent = comment.content;
-      commentsContainer.appendChild(commentElement);
+    submitBtn.addEventListener("click", () => {
+      console.log("trigger");
+      sendComment(post.id, post);
     });
-    modalBody.appendChild(commentsContainer);
+
+    modal.style.display = "flex";
+
+    //Display comments
+    console.log("Length of comments", comments.length);
+    if (comments && comments.length > 0) {
+      const commentsContainer = document.createElement("div");
+      commentsContainer.classList.add("comments-container");
+      comments.forEach((comment) => {
+        const commentElement = document.createElement("div");
+        commentElement.classList.add("comment");
+        commentElement.textContent = comment.content;
+        commentsContainer.appendChild(commentElement);
+      });
+      modalBody.appendChild(commentsContainer);
+    }
   }
 }
 
